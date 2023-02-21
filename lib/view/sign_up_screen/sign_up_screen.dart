@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:book_bank/firebase/auth.dart';
 import 'package:book_bank/generated/assets.dart';
 import 'package:book_bank/view/main_screen/main_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,10 +38,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool obscureText = true;
   bool flag = true;
   File file = File("sss");
-  bool isLoading=false;
-  setLoading(bool value){
+  bool isLoading = false;
+  setLoading(bool value) {
     setState(() {
-      isLoading=value;
+      isLoading = value;
     });
   }
 
@@ -65,8 +66,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     InkWell(
                         onTap: () async {
-                          final XFile? image =
-                              await _picker.pickImage(source: ImageSource.gallery);
+                          final XFile? image = await _picker.pickImage(
+                              source: ImageSource.gallery);
                           setState(() {
                             file = File(image!.path);
                             flag = false;
@@ -164,98 +165,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     ElevatedButton(
                         onPressed: () async {
-                          if (flag == false) {
-                            if (Validate.isValidEmail(email.text)) {
-                              if (countryText != 'Select Your Country') {
-                                if (Validate.isValidPassword(password.text)) {
-                                  if (password.text == confirmPassword.text) {
-                                    setLoading(true);
-                                    FirebaseAuth auth = FirebaseAuth.instance;
-                                    await auth
-                                        .createUserWithEmailAndPassword(
-                                            email: email.text,
-                                            password: password.text)
-                                        .then((value) async {
-                                      var database = FirebaseFirestore.instance
-                                          .collection("users");
-                                      await database.doc().set({
-                                        "name": name.text,
-                                        "email": email.text,
-                                        "country": countryText,
-                                        "password": password.text,
-                                        "image": Blob(file.readAsBytesSync()),
-                                      }).then((value) async {
-                                        setLoading(false);
-                                        final prefs =
-                                            await SharedPreferences.getInstance();
-                                        prefs.setString("email", email.text);
-                                        prefs.setString("password", password.text);
-                                        Get.to(const MainScreen());
-                                      }).catchError((e) {
-                                        setLoading(false);
-                                        Get.snackbar("Data Storing Fail",
-                                            "Something went wrong,please check your internet connection",
-                                            duration: const Duration(seconds: 5),
-                                            snackPosition: SnackPosition.BOTTOM,
-                                            margin: EdgeInsets.symmetric(
-                                                vertical: width * 0.05,
-                                                horizontal: width * 0.05));
-                                      });
-                                    }).catchError((e) {
-                                      setLoading(false);
-                                      Get.snackbar("Authentication Fail",
-                                          "Something went wrong,please check your internet connection",
-                                          duration: const Duration(seconds: 5),
-                                          snackPosition: SnackPosition.BOTTOM,
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: width * 0.05,
-                                              horizontal: width * 0.05));
-                                    });
-                                  } else {
-                                    Get.snackbar("password not match",
-                                        "Fill correct password",
-                                        duration: const Duration(seconds: 5),
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        margin: EdgeInsets.symmetric(
-                                            vertical: width * 0.05,
-                                            horizontal: width * 0.05));
-                                  }
-                                } else {
-                                  Get.snackbar("Incorrect password",
-                                      "Min 6 and Max 12 characters At least one uppercase characterAt least one lowercase characterAt least one numberAt least one special character [@#!%?]",
-                                      duration: const Duration(seconds: 5),
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: width * 0.05,
-                                          horizontal: width * 0.05));
-                                }
-                              } else {
-                                Get.snackbar(
-                                    "Select Country", "Please select your country",
-                                    duration: const Duration(seconds: 5),
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    margin: EdgeInsets.symmetric(
-                                        vertical: width * 0.05,
-                                        horizontal: width * 0.05));
-                              }
-                            } else {
-                              Get.snackbar(
-                                  "Invalid Email", "Please Provide Valid Email",
-                                  duration: const Duration(seconds: 5),
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: width * 0.05,
-                                      horizontal: width * 0.05));
-                            }
-                          } else {
-                            Get.snackbar(
-                                "Image Not Found", "Please Select Your Image",
-                                duration: const Duration(seconds: 5),
-                                snackPosition: SnackPosition.BOTTOM,
-                                margin: EdgeInsets.symmetric(
-                                    vertical: width * 0.05,
-                                    horizontal: width * 0.05));
-                          }
+                          Auth.signUp(
+                              name: name.text,
+                              email: email.text,
+                              country: country.text,
+                              password: password.text,
+                              confirmPassword: confirmPassword.text,
+                              file: file,
+                              flag: flag,
+                              width: width,
+                              setLoading: (bool value){setState(() {isLoading=value;});});
                         },
                         child: const Text("SignUp Now")),
                     SizedBox(

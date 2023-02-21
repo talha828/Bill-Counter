@@ -1,3 +1,4 @@
+import 'package:book_bank/firebase/auth.dart';
 import 'package:book_bank/view/main_screen/main_screen.dart';
 import 'package:book_bank/view/sign_up_screen/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             SingleChildScrollView(
               child: Container(
-                //height:height -10,
+                height:height ,
                 padding: EdgeInsets.symmetric(
                     vertical: width * 0.04, horizontal: width * 0.04),
                 child: Column(
@@ -107,47 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     ElevatedButton(
                         onPressed: () {
-                          if (Validate.isValidEmail(email.text)) {
-                            if (Validate.isValidPassword(password.text)) {
-                              setLoading(true);
-                              FirebaseAuth auth = FirebaseAuth.instance;
-                              auth
-                                  .signInWithEmailAndPassword(
-                                      email: email.text, password: password.text)
-                                  .then((value) async {
-                                    setLoading(false);
-                                final prefs = await SharedPreferences.getInstance();
-                                prefs.setString("email", email.text);
-                                prefs.setString("password", password.text);
-                                Get.to(const MainScreen());
-                              }).catchError((e) {
-                                setLoading(false);
-                                Get.snackbar("Login Failed",
-                                    "Please check your email and password",
-                                    duration: const Duration(seconds: 5),
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    margin: EdgeInsets.symmetric(
-                                        vertical: width * 0.05,
-                                        horizontal: width * 0.05));
-                              });
-                            } else {
-                              Get.snackbar("Incorrect password",
-                                  "Min 6 and Max 12   At least one uppercase characterAt least one lowercase characterAt least one numberAt least one special character [@#!%?]",
-                                  duration: const Duration(seconds: 5),
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: width * 0.05,
-                                      horizontal: width * 0.05));
-                            }
-                          } else {
-                            Get.snackbar(
-                                "Invalid Email", "Please Provide Valid Email",
-                                duration: const Duration(seconds: 5),
-                                snackPosition: SnackPosition.BOTTOM,
-                                margin: EdgeInsets.symmetric(
-                                    vertical: width * 0.05,
-                                    horizontal: width * 0.05));
-                          }
+                            Auth.login(email: email.text, password: password.text, width: width,setLoading:  (bool value){setState(() {isLoading=value;});});
                         },
                         child: const Text("Login Now")),
                     SizedBox(
