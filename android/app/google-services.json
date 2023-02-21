@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "806164143095",
+    "project_id": "book-bank-3c985",
+    "storage_bucket": "book-bank-3c985.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:806164143095:android:6e8135a8a81706a395ecf2",
+        "android_client_info": {
+          "package_name": "com.rubab.bookbank.book_bank"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "806164143095-n7pqjhrubkd8t91i22e22omtcpbn4iai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC75tdDhNoJVbHLMDzIbzbOg1eCfLuGZ6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "806164143095-n7pqjhrubkd8t91i22e22omtcpbn4iai.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
