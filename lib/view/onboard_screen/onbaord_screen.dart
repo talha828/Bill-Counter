@@ -57,7 +57,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       Text(
                         contents[i].discription,
                         textAlign: TextAlign.center,
