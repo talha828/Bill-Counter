@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../onboard_screen/onbaord_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -11,8 +14,15 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(child: Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: (){Get.to(const OnboardScreen());},child: const Icon(Icons.arrow_forward_ios_outlined),),
       appBar: AppBar(
         title:const Text("Happy FYP :)"),
+      actions: const[
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(Icons.add),
+        )
+      ],
       ),
       drawer: const Drawer(),
       body: Container(),
