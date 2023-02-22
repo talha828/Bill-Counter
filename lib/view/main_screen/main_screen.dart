@@ -1,3 +1,4 @@
+import 'package:book_bank/view/product_from_screen/product_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,10 +18,15 @@ class _MainScreenState extends State<MainScreen> {
       floatingActionButton: FloatingActionButton(onPressed: (){Get.to(const OnboardScreen());},child: const Icon(Icons.arrow_forward_ios_outlined),),
       appBar: AppBar(
         title:const Text("Happy FYP :)"),
-      actions: const[
-        Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Icon(Icons.add),
+      actions: [
+        InkWell(
+          onTap: (){
+            Get.to(FormProduct());
+          },
+          child:const  Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Icons.add),
+          ),
         )
       ],
       ),
