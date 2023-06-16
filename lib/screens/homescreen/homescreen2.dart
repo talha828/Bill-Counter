@@ -27,7 +27,8 @@ class _homescreen2State extends State<homescreen2> {
   List<Nearme> nearme = [];
 
   void _fetchBooks() async {
-    final querySnapshot = await FirebaseFirestore.instance.collection('Books').get();
+    final querySnapshot = await FirebaseFirestore.instance.collection('Books')
+        .get();
     List<Books> booksList = [];
     for (final document in querySnapshot.docs) {
       final book = Books.fromSnapshot(document);
@@ -37,8 +38,10 @@ class _homescreen2State extends State<homescreen2> {
       books = booksList;
     });
   }
+
   void _fetchNearme() async {
-    final querySnapshot = await FirebaseFirestore.instance.collection('Nearme').get();
+    final querySnapshot = await FirebaseFirestore.instance.collection('Nearme')
+        .get();
     List<Nearme> nearmeList = [];
     for (final document in querySnapshot.docs) {
       final near = Nearme.fromSnapshot(document);
@@ -50,7 +53,8 @@ class _homescreen2State extends State<homescreen2> {
   }
 
   void _fetchDonations() async {
-    final querySnapshot = await FirebaseFirestore.instance.collection('Donation ').get();
+    final querySnapshot = await FirebaseFirestore.instance.collection(
+        'Donation ').get();
     List<Donation> donationList = [];
     for (final document in querySnapshot.docs) {
       final donation = Donation.fromSnapshot(document);
@@ -69,331 +73,322 @@ class _homescreen2State extends State<homescreen2> {
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
 
 // Widget build() and other code...
-}
-Widget singleproducts(
-    BuildContext context,
-    String? book_image,
-    String? book_Name,
-    String? price,
-    String? status,
-    String? book_auther,
-    ) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 10),
-    height: 420,
-    width: 160,
-    decoration: BoxDecoration(
-      color: Colors.red,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Image.network("$book_image"),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 5,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  "$book_Name",
-                  style: TextStyle(
-                    color: Colors.purple,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$price RS',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Text(
-                  '$status',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Text(
-                  '$book_auther',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 5,
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(80, 25),
-                      backgroundColor: Colors.white,
+
+  Widget singleproducts(BuildContext context,
+      String? book_image,
+      String? book_Name,
+      String? price,
+      String? status,
+      String? book_auther,) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      height: 420,
+      width: 160,
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Image.network("$book_image"),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 5,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    "$book_Name",
+                    style: TextStyle(
+                      color: Colors.purple,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: const Text(
-                      "Cart",
-                      style: TextStyle(
-                        color: Colors.deepPurple,
+                  ),
+                  Text(
+                    '$price RS',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Text(
+                    '$status',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Text(
+                    '$book_auther',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 5,
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(80, 25),
+                        backgroundColor: Colors.white,
                       ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, cart.id);
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(80, 25),
-                      backgroundColor: Colors.purple,
-                    ),
-                    child: const Text(
-                      "Details",
-                      style: TextStyle(
-                        color: Colors.white,
+                      child: const Text(
+                        "Cart",
+                        style: TextStyle(
+                          color: Colors.deepPurple,
+                        ),
                       ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, cart.id);
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, ProductPage2.id);
-                    },
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(80, 25),
+                        backgroundColor: Colors.purple,
+                      ),
+                      child: const Text(
+                        "Details",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, ProductPage2.id);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
   }
 
 
-Widget singleproductsfornearme(
-    BuildContext context,
-    String? book_image,
-    String? book_Name,
-    String? price,
-    String? status,
-    String? book_auther,
-    ) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 10),
-    height: 420,
-    width: 160,
-    decoration: BoxDecoration(
-      color: Colors.red,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Image.network("$book_image"),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 5,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  "$book_Name",
-                  style: TextStyle(
-                    color: Colors.purple,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$price RS',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Text(
-                  '$status',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Text(
-                  '$book_auther',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 5,
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(80, 25),
-                      backgroundColor: Colors.white,
+  Widget singleproductsfornearme(BuildContext context,
+      String? book_image,
+      String? book_Name,
+      String? price,
+      String? status,
+      String? book_auther,) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      height: 420,
+      width: 160,
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Image.network("$book_image"),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 5,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    "$book_Name",
+                    style: TextStyle(
+                      color: Colors.purple,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: const Text(
-                      "Cart",
-                      style: TextStyle(
-                        color: Colors.deepPurple,
+                  ),
+                  Text(
+                    '$price RS',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Text(
+                    '$status',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Text(
+                    '$book_auther',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 5,
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(80, 25),
+                        backgroundColor: Colors.white,
                       ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, cart.id);
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(80, 25),
-                      backgroundColor: Colors.purple,
-                    ),
-                    child: const Text(
-                      "Details",
-                      style: TextStyle(
-                        color: Colors.white,
+                      child: const Text(
+                        "Cart",
+                        style: TextStyle(
+                          color: Colors.deepPurple,
+                        ),
                       ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, cart.id);
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, ProductPage2.id);
-                    },
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(80, 25),
+                        backgroundColor: Colors.purple,
+                      ),
+                      child: const Text(
+                        "Details",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, ProductPage2.id);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-}
+        ],
+      ),
+    );
+  }
 
-Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String? num_of_books, String? status, String? category) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 10),
-    height: 420,
-    width: 160,
-    decoration: BoxDecoration(
-      color: Colors.red,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Image.network(image ?? ''),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 5,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  nGO ?? '',
-                  style: TextStyle(
-                    color: Colors.purple,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  num_of_books ?? '',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Text(
-                  status ?? '',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Text(
-                  category ?? '',
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 5,
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(80, 25),
-                      backgroundColor: Colors.white,
+
+  Widget newdonatinsngos(BuildContext context, String? image, String? nGO,
+      String? num_of_books, String? status, String? category) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      height: 420,
+      width: 160,
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Image.network(image ?? ''),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 5,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    nGO ?? '',
+                    style: TextStyle(
+                      color: Colors.purple,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: const Text(
-                      "Cart",
-                      style: TextStyle(
-                        color: Colors.deepPurple,
+                  ),
+                  Text(
+                    num_of_books ?? '',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Text(
+                    status ?? '',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Text(
+                    category ?? '',
+                    style: TextStyle(
+                      color: Colors.purple,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 5,
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(80, 25),
+                        backgroundColor: Colors.white,
                       ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, cart.id);
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(80, 25),
-                      backgroundColor: Colors.purple,
-                    ),
-                    child: const Text(
-                      "Details",
-                      style: TextStyle(
-                        color: Colors.white,
+                      child: const Text(
+                        "Cart",
+                        style: TextStyle(
+                          color: Colors.deepPurple,
+                        ),
                       ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, cart.id);
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, DonationScreenSteps.id);
-                    },
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(80, 25),
+                        backgroundColor: Colors.purple,
+                      ),
+                      child: const Text(
+                        "Details",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, DonationScreenSteps.id);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-}
+        ],
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -678,7 +673,6 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
                           color: Colors.deepPurpleAccent,
                         ),
                         onPressed: () {
-
                           // Handle filter button press
                         },
                       ),
@@ -690,7 +684,8 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => PriceFilter()),
+                            MaterialPageRoute(
+                                builder: (context) => PriceFilter()),
                           );
                           // Handle filter button press
                         },
@@ -700,7 +695,8 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 10),
                 child: Column(
                   children: [
                     SizedBox(height: 16.0),
@@ -846,26 +842,26 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
               ),
 
               Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: Container(
-                  width: 30,
-                  height: 40,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: books.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return singleproducts(
-                        context,
-                        books[index].book_image,
-                        books[index].book_Name,
-                        books[index].price,
-                        books[index].status,
-                        books[index].book_author,
-                      );
-                    },
-                  ),
-                )
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  child: Container(
+                    width: 30,
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: books.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return singleproducts(
+                          context,
+                          books[index].book_image,
+                          books[index].book_Name,
+                          books[index].price,
+                          books[index].status,
+                          books[index].book_author,
+                        );
+                      },
+                    ),
+                  )
               ),
 
 
@@ -888,26 +884,26 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
 
 
               Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: Container(
-                  width: 30,
-                  height: 40,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: nearme.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return singleproducts(
-                        context,
-                        nearme[index].book_image,
-                        nearme[index].book_Name,
-                        nearme[index].price,
-                        nearme[index].status,
-                        nearme[index].book_author,
-                      );
-                    },
-                  ),
-                )
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  child: Container(
+                    width: 30,
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: nearme.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return singleproducts(
+                          context,
+                          nearme[index].book_image,
+                          nearme[index].book_Name,
+                          nearme[index].price,
+                          nearme[index].status,
+                          nearme[index].book_author,
+                        );
+                      },
+                    ),
+                  )
               ),
 
               Padding(
@@ -929,25 +925,26 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
 
 
               Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: Container(
-                  width: 30,
-                  height: 40,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount:donation.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return newdonatinsngos(
-                        donation[index].donationbook_image,
-                        donation[index].num_of_books,
-                        donation[index].nGO,
-                        donation[index].status,
-                        donation[index].catagory,
-                      );
-                    },
-                  ),
-                )
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  child: Container(
+                    width: 30,
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: donations.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return newdonatinsngos(
+                          context,
+                          donations[index].donationbook_image,
+                          donations[index].num_of_books,
+                          donations[index].nGO,
+                          donations[index].status,
+                          donations[index].catagory,
+                        );
+                      },
+                    ),
+                  )
               ),
 
             ],
@@ -967,7 +964,6 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
               ),
               onPressed: () {
                 Navigator.pushNamed(context, homescreen2.id);
-
               },
             ),
             IconButton(
@@ -985,7 +981,6 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
               ),
               onPressed: () {
                 Navigator.pushNamed(context, cart.id);
-
               },
             ),
             IconButton(
@@ -995,7 +990,6 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
               ),
               onPressed: () {
                 Navigator.pushNamed(context, favouritelist.id);
-
               },
             ),
           ],
@@ -1006,14 +1000,13 @@ Widget newdonatinsngos(BuildContext context, String? image, String? nGO, String?
         child: Icon(Icons.add),
         onPressed: () {
           Navigator.pushNamed(context, ProductListing.id);
-
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
     );
   }
-
+}
 
 
 class PriceFilter extends StatefulWidget {
