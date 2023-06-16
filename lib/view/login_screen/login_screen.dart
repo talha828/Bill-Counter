@@ -1,4 +1,5 @@
 import 'package:book_bank/firebase/auth.dart';
+import 'package:book_bank/screens/homescreen/homescreen2.dart';
 import 'package:book_bank/view/main_screen/main_screen.dart';
 import 'package:book_bank/view/sign_up_screen/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -108,7 +109,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     ElevatedButton(
                         onPressed: () {
-                            Auth.login(email: email.text, password: password.text, width: width,setLoading:  (bool value){setState(() {isLoading=value;});});
+
+                          // Navigator.pushNamed(context, homescreen2.id);
+                         Get.offAllNamed(homescreen2.id);
+                            // Auth.login(email: email.text, password: password.text, width: width,setLoading:  (bool value){setState(() {isLoading=value;});
+                            // if(!isLoading){
+                            //     Navigator.pushNamed(context, homescreen2.id);}
+                            //
+                            // });
                         },
                         child: const Text("Login Now")),
                     SizedBox(

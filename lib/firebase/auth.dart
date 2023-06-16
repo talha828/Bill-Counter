@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:validation_plus/validate.dart';
 
+import '../screens/homescreen/homescreen2.dart';
 import '../view/main_screen/main_screen.dart';
 
 class Auth {
@@ -43,7 +44,7 @@ class Auth {
                   final prefs = await SharedPreferences.getInstance();
                   prefs.setString("email", email);
                   prefs.setString("password", password);
-                  Get.to(const MainScreen());
+                  Get.to( homescreen2());
                 }).catchError((e) {
                   setLoading(false);
                   Get.snackbar("Data Storing Fail",
@@ -116,7 +117,7 @@ class Auth {
           final prefs = await SharedPreferences.getInstance();
           prefs.setString("email", email);
           prefs.setString("password", password);
-          Get.to(const MainScreen());
+          Get.to( homescreen2());
         }).catchError((e) {
           setLoading(false);
           Get.snackbar("Login Failed", "Please check your email and password",
