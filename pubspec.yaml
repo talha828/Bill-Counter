@@ -48,7 +48,7 @@ dependencies:
   firebase_auth: ^4.2.8
   cloud_firestore: ^4.4.2
   shared_preferences: ^2.0.17
-
+  path_provider: ^2.1.4
 
 
 dev_dependencies:
@@ -77,7 +77,6 @@ flutter:
   assets:
      - assets/
      - assets/logo/
-     - assets/icon/
      - assets/img/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -1,5 +1,4 @@
 import 'package:book_bank/firebase/auth.dart';
-import 'package:book_bank/screens/homescreen/homescreen2.dart';
 import 'package:book_bank/view/main_screen/main_screen.dart';
 import 'package:book_bank/view/sign_up_screen/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,10 +27,10 @@ class _LoginScreenState extends State<LoginScreen> {
   String hintText = "xyz01@gmail.com";
   String labelText = "Email";
   bool obscureText = true;
-  bool isLoading=false;
-  setLoading(bool value){
+  bool isLoading = false;
+  setLoading(bool value) {
     setState(() {
-      isLoading=value;
+      isLoading = value;
     });
   }
 
@@ -45,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             SingleChildScrollView(
               child: Container(
-                height:height ,
+                height: height - 30,
                 padding: EdgeInsets.symmetric(
                     vertical: width * 0.04, horizontal: width * 0.04),
                 child: Column(
@@ -107,18 +106,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: width * 0.1,
                     ),
-                    ElevatedButton(
-                        onPressed: () {
-
-                          // Navigator.pushNamed(context, homescreen2.id);
-                         Get.offAllNamed(homescreen2.id);
-                            // Auth.login(email: email.text, password: password.text, width: width,setLoading:  (bool value){setState(() {isLoading=value;});
-                            // if(!isLoading){
-                            //     Navigator.pushNamed(context, homescreen2.id);}
-                            //
-                            // });
-                        },
-                        child: const Text("Login Now")),
+                    Bbutton(
+                      onTap: () => Auth.login(
+                          email: email.text,
+                          password: password.text,
+                          width: width,
+                          setLoading: (bool value) {
+                            setState(() {
+                              isLoading = value;
+                            });
+                          }),
+                      title: "Login Now",
+                      width: width,
+                    ),
                     SizedBox(
                       height: width * 0.1,
                     ),

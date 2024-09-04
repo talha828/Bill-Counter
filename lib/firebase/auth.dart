@@ -7,14 +7,12 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:validation_plus/validate.dart';
 
-import '../screens/homescreen/homescreen2.dart';
 import '../view/main_screen/main_screen.dart';
 
 class Auth {
   static signUp(
       {required String name,
       required String email,
-      required String country,
       required String password,
       required String confirmPassword,
       required File file,
@@ -23,7 +21,6 @@ class Auth {
       var setLoading}) async {
     if (flag == false) {
       if (Validate.isValidEmail(email)) {
-        if (country != 'Select Your Country') {
           if (Validate.isValidPassword(password)) {
             if (password == confirmPassword) {
               setLoading(true);
@@ -36,7 +33,6 @@ class Auth {
                 await database.doc().set({
                   "name": name,
                   "email": email,
-                  "country": country,
                   "password": password,
                   "image": Blob(file.readAsBytesSync()),
                 }).then((value) async {
@@ -44,7 +40,7 @@ class Auth {
                   final prefs = await SharedPreferences.getInstance();
                   prefs.setString("email", email);
                   prefs.setString("password", password);
-                  Get.to( homescreen2());
+                  Get.to( MainScreen());
                 }).catchError((e) {
                   setLoading(false);
                   Get.snackbar("Data Storing Fail",
@@ -78,13 +74,6 @@ class Auth {
                 margin: EdgeInsets.symmetric(
                     vertical: width * 0.05, horizontal: width * 0.05));
           }
-        } else {
-          Get.snackbar("Select Country", "Please select your country",
-              duration: const Duration(seconds: 5),
-              snackPosition: SnackPosition.BOTTOM,
-              margin: EdgeInsets.symmetric(
-                  vertical: width * 0.05, horizontal: width * 0.05));
-        }
       } else {
         Get.snackbar("Invalid Email", "Please Provide Valid Email",
             duration: const Duration(seconds: 5),
@@ -117,7 +106,7 @@ class Auth {
           final prefs = await SharedPreferences.getInstance();
           prefs.setString("email", email);
           prefs.setString("password", password);
-          Get.to( homescreen2());
+          Get.to( MainScreen());
         }).catchError((e) {
           setLoading(false);
           Get.snackbar("Login Failed", "Please check your email and password",

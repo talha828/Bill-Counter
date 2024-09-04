@@ -91,7 +91,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>const MainScreen(),
+                      builder: (_) =>MainScreen(),
                     ),
                   );
                 }

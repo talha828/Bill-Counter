@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:book_bank/components/constant/constant.dart';
 import 'package:book_bank/firebase/auth.dart';
 import 'package:book_bank/generated/assets.dart';
+import 'package:book_bank/view/login_screen/login_screen.dart';
 import 'package:book_bank/view/main_screen/main_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_picker/country_picker.dart';
@@ -44,6 +46,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       isLoading = value;
     });
   }
+
+  void Function()? onTap = () {};
+  String title = "SignUp Now";
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +96,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       height: width * 0.1,
                     ),
                     Text(
-                      "Sign Up",
+                      "SIGN UP",
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: width * 0.08),
@@ -112,27 +117,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: email,
                         hintText: "xzy01@gmail.com",
                         labelText: "Email"),
-                    SizedBox(
-                      height: width * 0.04,
-                    ),
-                    InkWell(
-                      onTap: () => showCountryPicker(
-                        context: context,
-                        showPhoneCode:
-                            true, // optional. Shows phone code before the country name.
-                        onSelect: (country) {
-                          print('Select country: ${country.displayName}');
-                          countryText = country.displayName;
-                        },
-                      ),
-                      child: IgnorePointer(
-                          ignoring: true,
-                          child: BTextField(
-                              obscureText: false,
-                              controller: country,
-                              hintText: "Talha Iqbal",
-                              labelText: countryText)),
-                    ),
                     SizedBox(
                       height: width * 0.04,
                     ),
@@ -163,20 +147,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     SizedBox(
                       height: width * 0.1,
                     ),
-                    ElevatedButton(
-                        onPressed: () async {
-                          Auth.signUp(
-                              name: name.text,
-                              email: email.text,
-                              country: country.text,
-                              password: password.text,
-                              confirmPassword: confirmPassword.text,
-                              file: file,
-                              flag: flag,
-                              width: width,
-                              setLoading: (bool value){setState(() {isLoading=value;});});
-                        },
-                        child: const Text("SignUp Now")),
+                    Bbutton(
+                        onTap: ()async=>Auth.signUp(
+                            name: name.text,
+                            email: email.text,
+                            password: password.text,
+                            confirmPassword: confirmPassword.text,
+                            file: file,
+                            flag: flag,
+                            width: width,
+                            setLoading: (bool value) {
+                              setState(() {
+                                isLoading = value;
+                              });
+                            }),
+                        width: width,
+                        title: title),
                     SizedBox(
                       height: width * 0.1,
                     ),
@@ -189,9 +175,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           style: TextStyle(color: Colors.grey),
                         ),
                         InkWell(
-                          onTap: () => Get.to(const SignUpScreen()),
+                          onTap: () => Get.to(const LoginScreen()),
                           child: const Text(
-                            " SignIp",
+                            " Login",
                             textAlign: TextAlign.right,
                             style: TextStyle(
                                 color: Colors.blueAccent,
@@ -208,6 +194,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ? const Positioned.fill(child: LoadingIndicator())
                 : Container()
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class Bbutton extends StatelessWidget {
+  const Bbutton({
+    super.key,
+    required this.onTap,
+    required this.width,
+    required this.title,
+  });
+
+  final void Function()? onTap;
+  final double width;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: width * 0.04),
+        decoration: BoxDecoration(
+            color: appThemeColor, borderRadius: BorderRadius.circular(10)),
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
     );
