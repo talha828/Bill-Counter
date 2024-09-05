@@ -1,5 +1,6 @@
 import  'dart:async';
 
+import 'package:book_bank/components/constant/constant.dart';
 import 'package:book_bank/firebase/auth.dart';
 import 'package:book_bank/view/get_start_screen/get_start_screen.dart';
 import 'package:flutter/material.dart';
@@ -48,13 +49,14 @@ class _SplashScreenState extends State<SplashScreen> {
     var width = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
+        backgroundColor: appThemeColor,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Image.asset(
               Assets.logoLogo,
-              scale: 1.7,
+              scale: 2.5,
             ),
           ],
         ),

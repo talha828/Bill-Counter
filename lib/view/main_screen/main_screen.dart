@@ -38,13 +38,13 @@ class MainScreen extends StatelessWidget {
               final customer = customers[index];
               final customerId = customer.id;
               final name = customer['name'];
-              final currentBalance = customer['current_balance'];
+
 
               return FutureBuilder<QuerySnapshot>(
                 future: FirebaseFirestore.instance
                     .collection('customers')
                     .doc(customerId)
-                    .collection('monthly_data')
+                    .collection('monthly data')
                     .get(),
                 builder: (context, milkSnapshot) {
                   if (milkSnapshot.connectionState == ConnectionState.waiting) {
@@ -62,15 +62,17 @@ class MainScreen extends StatelessWidget {
                   }
 
                   final milkDataDocs = milkSnapshot.data!.docs;
+                  String currentBalance = "Loading";
                   String milkData = 'No milk data available';
                   if (milkDataDocs.isNotEmpty) {
                     final latestMilkData = milkDataDocs.last;
                     milkData = latestMilkData['milk_data'].toString();
+                     currentBalance = latestMilkData['total_balance'].toString();
                   }
 
                   return ListTile(
                     title: Text(name),
-                    subtitle: Text('Milk: $milkData, Remaining: \$${currentBalance.toStringAsFixed(2)}'),
+                    subtitle: Text('Milk: $milkData, Remaining: \$${currentBalance}'),
                     trailing: PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'input_data') {
@@ -90,7 +92,7 @@ class MainScreen extends StatelessWidget {
                               builder: (context) => BalanceDeductionScreen(
                                 customerId: customerId,
                                 customerName: name,
-                                currentBalance: currentBalance,
+                                currentBalance: double.parse(currentBalance),
                               ),
                             ),
                           );

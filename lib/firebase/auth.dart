@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -130,5 +130,11 @@ class Auth {
           margin: EdgeInsets.symmetric(
               vertical: width * 0.05, horizontal: width * 0.05));
     }
+  }
+
+  static String getCurrentDateFormatted() {
+    final now = DateTime.now();
+    final formatter = DateFormat('MMMM - yyyy'); // e.g., "August - 2024"
+    return formatter.format(now);
   }
 }
