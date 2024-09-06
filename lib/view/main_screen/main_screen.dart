@@ -1,19 +1,33 @@
-import 'package:book_bank/view/balances_deduction_screen/balances_deduction_screen.dart';
+import 'package:book_bank/components/constant/constant.dart';
+import 'package:book_bank/firebase/auth.dart';
 import 'package:book_bank/view/create_customer_screen/create_cusomer_screen.dart';
 import 'package:book_bank/view/monthly_data_input_screen/montly_data_input_screen.dart';
+import 'package:book_bank/view/monthly_data_input_screen/new_input.dart';
 import 'package:book_bank/view/montly_bill_generation_screen/monthly_bill_generation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 
 class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Milk Billing App'),
+        backgroundColor: appThemeColor,
+        centerTitle: true,
+        leading: Container(),
+        title: Text(
+          Auth.getCurrentDateFormatted(),
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -32,20 +46,19 @@ class MainScreen extends StatelessWidget {
 
           final customers = snapshot.data!.docs;
 
-          return ListView.builder(
+          return ListView.separated(
             itemCount: customers.length,
             itemBuilder: (context, index) {
               final customer = customers[index];
               final customerId = customer.id;
-              final name = customer['name'];
+              final name = customer['name'].toString().toUpperCase();
 
-
-              return FutureBuilder<QuerySnapshot>(
-                future: FirebaseFirestore.instance
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
                     .collection('customers')
                     .doc(customerId)
                     .collection('monthly data')
-                    .get(),
+                    .snapshots(),
                 builder: (context, milkSnapshot) {
                   if (milkSnapshot.connectionState == ConnectionState.waiting) {
                     return ListTile(
@@ -63,69 +76,70 @@ class MainScreen extends StatelessWidget {
 
                   final milkDataDocs = milkSnapshot.data!.docs;
                   String currentBalance = "Loading";
+                  String totalMilk = "Loading";
                   String milkData = 'No milk data available';
                   if (milkDataDocs.isNotEmpty) {
                     final latestMilkData = milkDataDocs.last;
-                    milkData = latestMilkData['milk_data'].toString();
-                     currentBalance = latestMilkData['total_balance'].toString();
+                    milkData = latestMilkData['summary'].toString();
+                    totalMilk = latestMilkData['total_milk'].toString();
+                    currentBalance =
+                        latestMilkData['previous_amount'].toString();
                   }
 
                   return ListTile(
-                    title: Text(name),
-                    subtitle: Text('Milk: $milkData, Remaining: \$${currentBalance}'),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (value) {
-                        if (value == 'input_data') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MonthlyDataInputScreen(
-                                customerId: customerId,
-                                customerName: name,
-                              ),
-                            ),
-                          );
-                        } else if (value == 'deduct_balance') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BalanceDeductionScreen(
-                                customerId: customerId,
-                                customerName: name,
-                                currentBalance: double.parse(currentBalance),
-                              ),
-                            ),
-                          );
-                        } else if (value == 'generate_bill') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BillGenerationScreen(),
-                            ),
-                          );
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          value: 'input_data',
-                          child: Text('Input Monthly Data'),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'deduct_balance',
-                          child: Text('Deduct Balance'),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'generate_bill',
-                          child: Text('Generate Bill'),
-                        ),
-                      ],
+                    onTap: () => Get.to(
+                      MilkEntryScreen(
+                        customerId: customerId,
+                        customerName: name,
+                        selectedMonth: Auth.getCurrentDateFormatted(),
+                        //TODO : Have to do something
+                      ),
+                    ),
+                    leading: Text(
+                      "${totalMilk}L",
+                      style: TextStyle(
+                          fontSize: width * 0.05, fontWeight: FontWeight.w100),
+                    ),
+                    title: Text(
+                      name,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                        '${milkData.split(":")[1].replaceAll("(", " ").replaceAll(")", " ").replaceAll("-", "--")}'),
+                    trailing: Text(
+                      currentBalance,
+                      style: TextStyle(fontSize: width * 0.05),
                     ),
                   );
                 },
               );
             },
+            separatorBuilder: (context, index) {
+              return Divider();
+            },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        elevation: 0.0,
+        onPressed: () => BillGenerationScreen(),
+        backgroundColor: appThemeColor,
+        label: Row(
+          children: [
+            const Text(
+              "Generate Bill",
+              style: TextStyle(color: Colors.white),
+            ),
+            SizedBox(
+              width: width * 0.02,
+            ),
+            Icon(
+              Icons.play_arrow_outlined,
+              color: Colors.white,
+              size: width * 0.1,
+            ),
+          ],
+        ),
       ),
     );
   }
