@@ -1,6 +1,4 @@
 import 'package:book_bank/components/constant/constant.dart';
-import 'package:book_bank/generated/assets.dart';
-import 'package:book_bank/view/get_start_screen/get_start_screen.dart';
 import 'package:book_bank/view/splash_screen/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -27,14 +25,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-//ab test kar k bto ok wait
       theme: ThemeData(
         primaryColor: appThemeColor,
         primaryColorDark: appThemeColor,
         primarySwatch: createMaterialColor(const Color(0xff6C63FF)),
-        textTheme: GoogleFonts.montserratTextTheme(Theme.of(context).textTheme),
+        textTheme: GoogleFonts.mulishTextTheme(Theme.of(context).textTheme),
         primaryTextTheme:
-        GoogleFonts.montserratTextTheme(Theme.of(context).textTheme),
+        GoogleFonts.mulishTextTheme(Theme.of(context).textTheme),
       ),
 
 

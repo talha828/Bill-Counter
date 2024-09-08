@@ -5,18 +5,18 @@ import 'package:book_bank/view/sign_up_screen/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MilkEntryScreen extends StatefulWidget {
+class MonthlyDataInputScreen extends StatefulWidget {
   final String customerId;
   final String selectedMonth; // in "July - 2024" format
   final String customerName;
 
-  MilkEntryScreen({required this.customerId, required this.selectedMonth, required this.customerName});
+  MonthlyDataInputScreen({required this.customerId, required this.selectedMonth, required this.customerName});
 
   @override
-  _MilkEntryScreenState createState() => _MilkEntryScreenState();
+  _MonthlyDataInputScreenState createState() => _MonthlyDataInputScreenState();
 }
 
-class _MilkEntryScreenState extends State<MilkEntryScreen> {
+class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
   final TextEditingController _previousAmount = TextEditingController();
   List<List<int>> milkEntries = [];
   int totalMilk = 0;

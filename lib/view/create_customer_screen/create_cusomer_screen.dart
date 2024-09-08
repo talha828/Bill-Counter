@@ -1,7 +1,9 @@
 import 'dart:ffi';
 
+import 'package:book_bank/components/constant/constant.dart';
 import 'package:book_bank/components/widgets/btextfield.dart';
 import 'package:book_bank/firebase/auth.dart';
+import 'package:book_bank/helper/helper.dart';
 import 'package:book_bank/view/sign_up_screen/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,35 +20,16 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   final _nameController = TextEditingController();
   final _preBalanceController = TextEditingController();
   List<List<int>> milkEntries = [];
-  int getDaysInMonth(String monthYear) {
-    List<String> parts = monthYear.split(' - ');
-    String monthName = parts[0];
-    int year = int.parse(parts[1]);
-
-    Map<String, int> monthMap = {
-      'January': 1,
-      'February': 2,
-      'March': 3,
-      'April': 4,
-      'May': 5,
-      'June': 6,
-      'July': 7,
-      'August': 8,
-      'September': 9,
-      'October': 10,
-      'November': 11,
-      'December': 12
-    };
-
-    int month = monthMap[monthName]!;
-
-    DateTime firstDayOfNextMonth = DateTime(year, month + 1, 1);
-    int daysInMonth = firstDayOfNextMonth.subtract(Duration(days: 1)).day;
-
-    return daysInMonth;
+  bool isLoading = false;
+  setLoading(bool value) {
+    setState(() {
+      isLoading = value;
+    });
   }
 
+
   void _saveCustomer() {
+    setLoading(true);
     final String name = _nameController.text;
     FirebaseFirestore.instance.collection('customers').add({
       'name': name,
@@ -62,17 +45,13 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         "previous_amount": _preBalanceController.text,
         "summary": "aa:(0-0):00",
       }).then((_){
+        setLoading(false);
         Navigator.of(context).pop();
-      });
+      }).catchError((e){setLoading(false);});
     });
   }
 
-  setEntriesCount(){
-    setState(() {
-      int daysInSelectedMonth = getDaysInMonth(Auth.getCurrentDateFormatted());
-      milkEntries = List.generate(daysInSelectedMonth, (index) => [0]);
-    });
-  }
+  setEntriesCount() => setState(() => milkEntries = List.generate(Helper.getDaysInMonth(Auth.getCurrentDateFormatted()), (index) => [0]));
   @override
   void initState() {
     setEntriesCount();
@@ -83,35 +62,40 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Customer'),
+        backgroundColor: appThemeColor,
+        title:const Text('Create Customer',style: TextStyle(color: Colors.white),),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            BTextField(
-              controller: _nameController,
-              hintText: 'Hamza',
-              labelText: "Customer Name",
-              obscureText: false,
-            ),
-            SizedBox(height: width * 0.04),
-            BTextField(
-              hintText: "1000",
-              labelText: "Previous Balance",
-              obscureText: false,
-              controller: _preBalanceController,
-            ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                BTextField(
+                  controller: _nameController,
+                  hintText: 'Hamza',
+                  labelText: "Customer Name",
+                  obscureText: false,
+                ),
+                SizedBox(height: width * 0.04),
+                BTextField(
+                  hintText: "1000",
+                  labelText: "Previous Balance",
+                  obscureText: false,
+                  controller: _preBalanceController,
+                ),
 
-            SizedBox(height: width * 0.15),
-            Bbutton(
-              width: width,
-              onTap: _saveCustomer,
-              title: 'Save Customer',
+                SizedBox(height: width * 0.15),
+                Bbutton(
+                  width: width,
+                  onTap: _saveCustomer,
+                  title: 'Save Customer',
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

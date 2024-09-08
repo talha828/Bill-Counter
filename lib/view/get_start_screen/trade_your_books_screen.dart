@@ -32,7 +32,7 @@ class _TradeYourBooksScreenState extends State<TradeYourBooksScreen> {
               ),
             );
           },
-          child: const Icon(Icons.arrow_forward_ios_outlined),
+          child: const Icon(Icons.arrow_forward_ios_outlined,color: Colors.white,),
         ),
         body: Container(
           padding: EdgeInsets.symmetric(
