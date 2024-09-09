@@ -29,6 +29,49 @@
             {
               "client_id": "806164143095-n7pqjhrubkd8t91i22e22omtcpbn4iai.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "806164143095-q7ufr9p4dl1uqdrut7mbvfv2mm932lec.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.rubab.bookbank.bookBank"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:806164143095:android:e9ac64b0bd823c5695ecf2",
+        "android_client_info": {
+          "package_name": "com.talhaiqbal.billcounter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "806164143095-n7pqjhrubkd8t91i22e22omtcpbn4iai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC75tdDhNoJVbHLMDzIbzbOg1eCfLuGZ6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "806164143095-n7pqjhrubkd8t91i22e22omtcpbn4iai.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "806164143095-q7ufr9p4dl1uqdrut7mbvfv2mm932lec.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.rubab.bookbank.bookBank"
+              }
             }
           ]
         }

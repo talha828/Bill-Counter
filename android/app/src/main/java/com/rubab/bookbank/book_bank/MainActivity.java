@@ -1,4 +1,4 @@
-package com.rubab.bookbank.book_bank;
+package com.talhaiqbal.billcounter;
 
 import io.flutter.embedding.android.FlutterActivity;
 
