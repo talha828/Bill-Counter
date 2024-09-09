@@ -10,26 +10,32 @@ class MonthlyDataInputScreen extends StatefulWidget {
   final String selectedMonth; // in "July - 2024" format
   final String customerName;
 
-  MonthlyDataInputScreen({required this.customerId, required this.selectedMonth, required this.customerName});
+  const MonthlyDataInputScreen({
+    super.key,
+    required this.customerId,
+    required this.selectedMonth,
+    required this.customerName,
+  });
 
   @override
-  _MonthlyDataInputScreenState createState() => _MonthlyDataInputScreenState();
+  State<MonthlyDataInputScreen> createState() => _MonthlyDataInputScreenState();
 }
 
 class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
   final TextEditingController _previousAmount = TextEditingController();
-  List<List<int>> milkEntries = [];
-  int totalMilk = 0;
+  final TextEditingController _receivedAmount = TextEditingController();
+  List<List<double>> milkEntries = [];
+  double totalMilk = 0;
   int previousAmount = 0;
   String summary = "";
 
   bool isSwiping = false;
-  int swipeValue = 0;
+  double swipeValue = 0;
 
   // Function to calculate the total milk
   void calculateTotal() {
     setState(() {
-      totalMilk = milkEntries.fold(0, (sum, entry) => sum + entry[0]);
+      totalMilk = milkEntries.fold(0, (double sum, entry) => double.parse((sum + entry[0]).toString()));
     });
   }
 
@@ -58,7 +64,7 @@ class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
     int previousAmount = this.previousAmount;
 
     // Group consecutive similar entries
-    int currentQuantity = milkEntries[0][0];
+    double currentQuantity = milkEntries[0][0];
     int startDay = 1;
     int count = 1;
 
@@ -77,7 +83,8 @@ class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
     groupedEntries.add("($currentQuantity-${startDay + count - 1})");
 
     // Create summary string
-    String summary = "$name:" + groupedEntries.join('') + ":${_previousAmount.text}";
+    String summary =
+        "$name:${groupedEntries.join('')}:${int.parse(_previousAmount.text) - int.parse(_previousAmount.text)}";
 
     // Save to Firebase
     FirebaseFirestore.instance
@@ -88,20 +95,22 @@ class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
         .update({
       "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
       "total_milk": totalMilk,
+      "received_amount": _receivedAmount.text,
       "previous_amount": _previousAmount.text,
       "summary": summary,
     }).then((_) {
       setLoading(false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Data saved successfully!')));
-      Future.delayed(const Duration(milliseconds: 1500),(){Navigator.pop(context);});
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Data saved successfully!')));
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        Navigator.pop(context);
+      });
     }).catchError((error) {
       setLoading(false);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to save data: $error')));
     });
   }
-
 
   // Fetch data from Firebase on screen load
   void fetchData() async {
@@ -114,9 +123,12 @@ class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
 
     if (document.exists) {
       setState(() {
-        _previousAmount.text = (document.get('previous_amount') ?? 0).toString();
+        _previousAmount.text =
+            (document.get('previous_amount') ?? 0).toString();
+        _receivedAmount.text =
+            (document.get('received_amount') ?? 0).toString();
         List<dynamic> entries = document.get('milk_entries') ?? [];
-        milkEntries = List.generate(entries.length, (i) => [entries[i] as int]);
+        milkEntries = List.generate(entries.length, (i) => [double.parse(entries[i].toString())]);
         calculateTotal();
       });
     }
@@ -147,7 +159,7 @@ class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
 
     DateTime firstDayOfMonth = DateTime(year, month, 1);
     DateTime firstDayOfNextMonth = DateTime(year, month + 1, 1);
-    int daysInMonth = firstDayOfNextMonth.subtract(Duration(days: 1)).day;
+    int daysInMonth = firstDayOfNextMonth.subtract(const Duration(days: 1)).day;
 
     return daysInMonth;
   }
@@ -165,24 +177,26 @@ class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        TextEditingController controller = TextEditingController(text: milkEntries[index][0].toString());
+        TextEditingController controller =
+            TextEditingController(text: milkEntries[index][0].toString());
         return AlertDialog(
           title: Text("Edit Milk Quantity for Day ${index + 1}"),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: 'Milk Quantity (Liters)'),
+            decoration:
+                const InputDecoration(labelText: 'Milk Quantity (Liters)'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 setState(() {
-                  milkEntries[index][0] = int.tryParse(controller.text) ?? 0;
+                  milkEntries[index][0] = double.tryParse(controller.text) ?? 0;
                   calculateTotal();
                 });
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -205,43 +219,69 @@ class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.customerName}".toUpperCase()),
+        title: Text(widget.customerName.toUpperCase()),
       ),
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Previous Amount Input
-                BTextField(controller: _previousAmount, hintText: "27000", labelText: "Previous Amount", obscureText: false),
-                SizedBox(height: 20),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Previous Amount Input
+                  BTextField(
+                      controller: _previousAmount,
+                      hintText: "27000",
+                      labelText: "Previous Amount",
+                      obscureText: false),
+                  SizedBox(height: width * 0.04),
+                  BTextField(
+                      controller: _receivedAmount,
+                      hintText: "1000",
+                      labelText: "Received Amount",
+                      obscureText: false),
+                  SizedBox(height: width * 0.04),
 
-                // Milk Entries Grid (Editable Cells)
-                Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+
+                  // Milk Entries Grid (Editable Cells)
+                  GridView.builder(
+                    physics:const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 5, // Two rows
-                      childAspectRatio:1, // Adjust height to make rows taller
+                      childAspectRatio: 1, // Adjust height to make rows taller
                     ),
                     itemCount: milkEntries.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
-                        onTap: () => refillPreviousEntry(index), // Refill on single tap
-                        onDoubleTap: () => editCell(index), // Edit on double tap
+                        onTap: () =>
+                            refillPreviousEntry(index), // Refill on single tap
+                        onDoubleTap: () =>
+                            editCell(index), // Edit on double tap
                         child: Container(
-                          color: milkEntries[index][0] == 0 ?Colors.white:appThemeColor.withOpacity(0.5),
+                          color: milkEntries[index][0] == 0
+                              ? Colors.white
+                              : appThemeColor.withOpacity(0.5),
                           child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text("Day ${index + 1}",
-                                  style: TextStyle(color:milkEntries[index][0] == 0 ? Colors.black: Colors.black),
+                                Text(
+                                  "Day ${index + 1}",
+                                  style: TextStyle(
+                                      color: milkEntries[index][0] == 0
+                                          ? Colors.black
+                                          : Colors.black),
                                 ), // Show the date
                                 Text(
                                   "${milkEntries[index][0]} L",
-                                  style: TextStyle(fontSize: 18,color:milkEntries[index][0] == 0 ? Colors.black: Colors.white),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: milkEntries[index][0] == 0
+                                          ? Colors.black
+                                          : Colors.white),
                                 ),
                               ],
                             ),
@@ -250,10 +290,13 @@ class _MonthlyDataInputScreenState extends State<MonthlyDataInputScreen> {
                       );
                     },
                   ),
-                ),
-                Bbutton(onTap: saveData, width: width, title: "Save Now  ( $totalMilk ) L"),
-                SizedBox(height: 10),
-              ],
+                  SizedBox(height: width * 0.04,),
+                  Bbutton(
+                      onTap: saveData,
+                      width: width,
+                      title: "Save Now  ( $totalMilk ) L"),
+                ],
+              ),
             ),
           ),
           isLoading

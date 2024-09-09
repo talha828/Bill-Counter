@@ -5,14 +5,14 @@ import '../../components/constant/constant.dart';
 import '../../generated/assets.dart';
 import '../login_screen/login_screen.dart';
 
-class DonateYourBooksScreen extends StatefulWidget {
-  const DonateYourBooksScreen({Key? key}) : super(key: key);
+class CreatePDFInvoiceScreen extends StatefulWidget {
+  const CreatePDFInvoiceScreen({Key? key}) : super(key: key);
 
   @override
-  State<DonateYourBooksScreen> createState() => _DonateYourBooksScreenState();
+  State<CreatePDFInvoiceScreen> createState() => _CreatePDFInvoiceScreenState();
 }
 
-class _DonateYourBooksScreenState extends State<DonateYourBooksScreen> {
+class _CreatePDFInvoiceScreenState extends State<CreatePDFInvoiceScreen> {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
@@ -43,7 +43,7 @@ class _DonateYourBooksScreenState extends State<DonateYourBooksScreen> {
                 scale: 4,
               ),
               Text(
-                "Donate Your Books",
+                "Create PDF Invoice",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Colors.white,
@@ -51,7 +51,7 @@ class _DonateYourBooksScreenState extends State<DonateYourBooksScreen> {
                     fontSize: width * 0.07),
               ),
               const Text(
-                "Clear your bookshelf and make a difference by donating your books through our app. Easy, convenient, and for a good cause.Make an impact by donating your books through our app - it's simple, convenient, and helps spread the joy of reading to others.",
+                "Generate professional invoices quickly and effortlessly. Input your customer details, itemize services or products, and instantly create a polished PDF invoice. Save time and keep your records organized with ease",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
               ),

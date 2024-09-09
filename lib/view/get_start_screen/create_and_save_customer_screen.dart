@@ -1,18 +1,18 @@
-import 'package:book_bank/view/get_start_screen/donate_your_books_screen.dart';
+import 'package:book_bank/view/get_start_screen/create_pdf_invoice_screen.dart';
 import 'package:circular_clip_route/circular_clip_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../components/constant/constant.dart';
 import '../../generated/assets.dart';
 
-class TradeYourBooksScreen extends StatefulWidget {
-  const TradeYourBooksScreen({Key? key}) : super(key: key);
+class CreateAndSaveCustomerScreen extends StatefulWidget {
+  const CreateAndSaveCustomerScreen({Key? key}) : super(key: key);
 
   @override
-  State<TradeYourBooksScreen> createState() => _TradeYourBooksScreenState();
+  State<CreateAndSaveCustomerScreen> createState() => _CreateAndSaveCustomerScreenState();
 }
 
-class _TradeYourBooksScreenState extends State<TradeYourBooksScreen> {
+class _CreateAndSaveCustomerScreenState extends State<CreateAndSaveCustomerScreen> {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
@@ -28,7 +28,7 @@ class _TradeYourBooksScreenState extends State<TradeYourBooksScreen> {
               CircularClipRoute<void>(
                 transitionDuration: const Duration(seconds: 1),
                 expandFrom: context,
-                builder: (_) => const DonateYourBooksScreen(),
+                builder: (_) => const CreatePDFInvoiceScreen(),
               ),
             );
           },
@@ -46,13 +46,13 @@ class _TradeYourBooksScreenState extends State<TradeYourBooksScreen> {
                 scale: 4,
               ),
               Text(
-                "Trade Your Books",
+                "Create And Save Customer",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontSize: width * 0.07),
               ),
               const Text(
-                "Looking for a way to refresh your book collection without breaking the bank? Look no further than our book trading app. With just a few clicks, you can upload the books you no longer need, and browse through the extensive selection of titles offered by fellow bookworms around the world.",
+                "Easily create and save customer profiles with just a few clicks. Store essential information securely and access it anytime. Simplify your customer management and keep everything organized!",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.black54),
               ),

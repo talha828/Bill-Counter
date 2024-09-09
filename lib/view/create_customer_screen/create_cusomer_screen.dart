@@ -11,8 +11,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 class AddCustomerScreen extends StatefulWidget {
+  const AddCustomerScreen({Key? key}) : super(key: key);
   @override
-  _AddCustomerScreenState createState() => _AddCustomerScreenState();
+  State<AddCustomerScreen> createState() => _AddCustomerScreenState();
 }
 
 class _AddCustomerScreenState extends State<AddCustomerScreen> {
@@ -42,8 +43,9 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
           .set({
         "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
         "total_milk": 00,
+        "received_amount": 00,
         "previous_amount": _preBalanceController.text,
-        "summary": "aa:(0-0):00",
+        "summary": "aa:(0-0):${_preBalanceController.text}",
       }).then((_){
         setLoading(false);
         Navigator.of(context).pop();

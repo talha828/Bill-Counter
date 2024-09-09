@@ -1,5 +1,5 @@
 import 'package:book_bank/generated/assets.dart';
-import 'package:book_bank/view/get_start_screen/trade_your_books_screen.dart';
+import 'package:book_bank/view/get_start_screen/create_and_save_customer_screen.dart';
 import 'package:circular_clip_route/circular_clip_route.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +31,7 @@ class _GetStartScreenState extends State<GetStartScreen> {
                   curve: Curves.easeInCirc,
                   transitionDuration: const Duration(milliseconds: 700),
                   expandFrom: context,
-                  builder: (_) => const TradeYourBooksScreen(),
+                  builder: (_) => const CreateAndSaveCustomerScreen(),
                 ));
           },
           child: const Icon(
@@ -52,7 +52,7 @@ class _GetStartScreenState extends State<GetStartScreen> {
                 scale: 4,
               ),
               Text(
-                "Welcome To Book Bank",
+                "Welcome To Bill Counter",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Colors.white,
@@ -60,7 +60,7 @@ class _GetStartScreenState extends State<GetStartScreen> {
                     fontSize: width * 0.07),
               ),
               const Text(
-                "Welcome to our book bank app! Trade your books with fellow book lovers from around the world. Create an account, upload your books, and start exchanging. Happy reading!",
+                "Welcome to our Milk Billing app! Easily manage your customers' milk deliveries and generate PDF invoices with just a few taps. Track daily milk quantities, calculate totals, and store everything securely in Firestore. Simplify your billing process today!",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
               ),
