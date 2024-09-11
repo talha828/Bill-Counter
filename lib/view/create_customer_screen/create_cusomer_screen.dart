@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 class AddCustomerScreen extends StatefulWidget {
   const AddCustomerScreen({Key? key}) : super(key: key);
   @override
@@ -64,6 +65,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(icon:Icon(Icons.arrow_back,color: Colors.white,) ,onPressed: ()=>Navigator.pop(context),),
         backgroundColor: appThemeColor,
         title:const Text('Create Customer',style: TextStyle(color: Colors.white),),
       ),

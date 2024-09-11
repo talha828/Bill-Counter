@@ -1,0 +1,250 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:book_bank/helper/helper.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:intl/intl.dart' ;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+
+class MainScreenController extends GetxController {
+  var selectedMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(Duration(days: 30))).obs;
+  var availableMonths = <String>[].obs;
+  var milkEntries = <List<int>>[].obs;
+  var isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadAvailableMonths(); // Load months when the screen starts
+  }
+
+  void setLoading(bool value) {
+    isLoading(value);
+  }
+
+  Future<void> showMonthPickerDialog(BuildContext context) async {
+    String? selectedMonthResult = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pick a month'),
+          content: SizedBox(
+            height: 200,
+            width: 300,
+            child: ListView.separated(
+              itemCount: availableMonths.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(availableMonths[index]),
+                  onTap: () {
+                    selectedMonth.value = availableMonths[index];
+                    Navigator.pop(context);
+                  },
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const Divider();
+              },
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selectedMonthResult != null) {
+      selectedMonth.value = selectedMonthResult;
+    }
+  }
+
+  Future<void> _loadAvailableMonths() async {
+    final firestore = FirebaseFirestore.instance;
+    QuerySnapshot snapshot = await firestore.collection('customers').get();
+    Set<String> months = {};
+
+    for (var doc in snapshot.docs) {
+      QuerySnapshot monthlyDataSnapshot = await firestore
+          .collection('customers')
+          .doc(doc.id)
+          .collection("monthly data")
+          .get();
+
+      monthlyDataSnapshot.docs.forEach((doc) {
+        months.add(doc.id); // Add month (doc id) to the set
+      });
+    }
+    availableMonths.assignAll(months.toList());
+  }
+
+  void setEntriesCount() {
+    milkEntries.assignAll(List.generate(
+        Helper.getDaysInMonth(selectedMonth.value), (index) => [0]));
+  }
+
+  Future<void> copyCustomerNamesForNewMonth(BuildContext context) async {
+    setLoading(true);
+    try {
+      DateTime? pickedDate = await showMonthPicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2100),
+      );
+
+      if (pickedDate != null) {
+        selectedMonth.value = DateFormat('MMMM - yyyy').format(pickedDate);
+        setEntriesCount();
+        final firestore = FirebaseFirestore.instance;
+        final customersSnapshot = await firestore.collection('customers').get();
+
+        String previousMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(Duration(days: 30)));
+
+        for (var doc in customersSnapshot.docs) {
+          final documentSnapshot = await firestore
+              .collection('customers')
+              .doc(doc.id)
+              .collection('monthly data')
+              .doc(previousMonth)
+              .get();
+
+          String previousAmount =
+              documentSnapshot.data()?['previous_amount']?.toString() ?? '0';
+          String receivedAmount =
+              documentSnapshot.data()?['received_amount']?.toString() ?? '0';
+
+          double newPreviousAmount =
+              double.parse(previousAmount) - double.parse(receivedAmount);
+
+          await firestore
+              .collection('customers')
+              .doc(doc.id)
+              .collection("monthly data")
+              .doc(selectedMonth.value)
+              .set({
+            "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
+            "total_milk": 00,
+            "received_amount": 00,
+            "previous_amount": int.parse(newPreviousAmount.toStringAsFixed(0)),
+            "summary": "${doc['name']}:(0-0):${newPreviousAmount.toStringAsFixed(0)}",
+          });
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error during operation: $e");
+      }
+    } finally {
+      setLoading(false);
+      _loadAvailableMonths();
+    }
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getCustomerMonthlyDataStream(String customerId) {
+    final firestore = FirebaseFirestore.instance;
+    return firestore
+        .collection('customers')
+        .doc(customerId)
+        .collection("monthly data")
+        .doc(selectedMonth.value)
+        .snapshots();
+  }
+
+
+  Future<List<String>> getCustomerData() async {
+    final firestore = FirebaseFirestore.instance;
+    List<String> customerData = [];
+
+    QuerySnapshot snapshot = await firestore.collection('customers').get();
+
+    for (var doc in snapshot.docs) {
+      try {
+        DocumentSnapshot<Map<String, dynamic>> summary = await firestore
+            .collection('customers')
+            .doc(doc.id)
+            .collection("monthly data")
+            .doc(selectedMonth.value)
+            .get();
+
+        if (summary.exists && summary.data() != null && summary.data()!.containsKey('summary')) {
+          customerData.add(summary['summary'].toString());
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error fetching summary for ${doc.id}: $e');
+        }
+      }
+    }
+    return customerData;
+  }
+
+  Future<void> fetchAndOpenPdf(BuildContext context) async {
+    setLoading(true);
+
+    final Map<String, dynamic> data = {
+      "customer_data": await getCustomerData(),
+      "date": "September - 2024",
+      "company_name": "Yousaf Meo",
+      "milk_price_per_liter": 220
+    };
+
+    try {
+      String url = 'https://flask-api-invoice.onrender.com/api/invoice_pdf';
+
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        Directory directory = await getTemporaryDirectory();
+        String filePath = '${directory.path}/invoice.pdf';
+        File file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        OpenFile.open(filePath);
+      } else {
+        if (kDebugMode) {
+          print('Failed to fetch PDF. Status code: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  Future<void> deleteCustomer(String customerId) async {
+    final firestore = FirebaseFirestore.instance;
+    try {
+      await firestore.collection('customers').doc(customerId).delete();
+      if (kDebugMode) {
+        print("Customer Deleted");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Customer not Deleted $e");
+      }
+    }
+  }
+
+  Future<void> deleteMonthlyData(String customerId, String month) async {
+    final firestore = FirebaseFirestore.instance;
+    try {
+      await firestore.collection('customers').doc(customerId).collection('monthly data').doc(month).delete();
+      if (kDebugMode) {
+        print("Monthly data for $month deleted successfully.");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error deleting monthly data: $e");
+      }
+    }
+  }
+}
