@@ -4,7 +4,7 @@
  
  - Flutter Android Application
 
-Welcome to **Customer Manager**, a Flutter-based Android app designed to help you efficiently create, save, and manage customer profiles. Whether you run a small business or handle customer information regularly, this app simplifies the process of storing and accessing customer details.
+Welcome to **App**, a Flutter-based Android app designed to help you efficiently create, save, and manage customer profiles. Whether you run a small business or handle customer information regularly, this app simplifies the process of storing and accessing customer details.
 
 ## Features
 
