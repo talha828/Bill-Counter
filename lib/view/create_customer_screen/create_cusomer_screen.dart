@@ -1,73 +1,26 @@
-import 'dart:ffi';
-
 import 'package:book_bank/components/constant/constant.dart';
+import 'package:book_bank/components/widgets/bbutton.dart';
 import 'package:book_bank/components/widgets/btextfield.dart';
-import 'package:book_bank/firebase/auth.dart';
-import 'package:book_bank/helper/helper.dart';
-import 'package:book_bank/view/sign_up_screen/sign_up_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:book_bank/components/widgets/loading_indicator.dart';
+import 'package:book_bank/model/create_customer_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-class AddCustomerScreen extends StatefulWidget {
-  const AddCustomerScreen({Key? key}) : super(key: key);
-  @override
-  State<AddCustomerScreen> createState() => _AddCustomerScreenState();
-}
+class AddCustomerScreen extends StatelessWidget {
+   AddCustomerScreen({super.key});
 
-class _AddCustomerScreenState extends State<AddCustomerScreen> {
-
-  final _nameController = TextEditingController();
-  final _preBalanceController = TextEditingController();
-  List<List<int>> milkEntries = [];
-  bool isLoading = false;
-  setLoading(bool value) {
-    setState(() {
-      isLoading = value;
-    });
-  }
-
-
-  void _saveCustomer() {
-    setLoading(true);
-    final String name = _nameController.text;
-    FirebaseFirestore.instance.collection('customers').add({
-      'name': name,
-    }).then((value) {
-      FirebaseFirestore.instance
-          .collection('customers')
-          .doc(value.id)
-          .collection('monthly data')
-          .doc(Auth.getCurrentDateFormatted())
-          .set({
-        "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
-        "total_milk": 00,
-        "received_amount": 00,
-        "previous_amount": _preBalanceController.text,
-        "summary": "aa:(0-0):${_preBalanceController.text}",
-      }).then((_){
-        setLoading(false);
-        Navigator.of(context).pop();
-      }).catchError((e){setLoading(false);});
-    });
-  }
-
-  setEntriesCount() => setState(() => milkEntries = List.generate(Helper.getDaysInMonth(Auth.getCurrentDateFormatted()), (index) => [0]));
-  @override
-  void initState() {
-    setEntriesCount();
-    super.initState();
-  }
+  final CreateCustomerController controller = Get.put(CreateCustomerController());
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(icon:Icon(Icons.arrow_back,color: Colors.white,) ,onPressed: ()=>Navigator.pop(context),),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Get.back(), // Using GetX navigation
+        ),
         backgroundColor: appThemeColor,
-        title:const Text('Create Customer',style: TextStyle(color: Colors.white),),
+        title: const Text('Create Customer', style: TextStyle(color: Colors.white)),
       ),
       body: Stack(
         children: [
@@ -77,28 +30,32 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 BTextField(
-                  controller: _nameController,
+                  controller: controller.nameController,
                   hintText: 'Hamza',
                   labelText: "Customer Name",
                   obscureText: false,
                 ),
                 SizedBox(height: width * 0.04),
                 BTextField(
+                  controller: controller.preBalanceController,
                   hintText: "1000",
                   labelText: "Previous Balance",
                   obscureText: false,
-                  controller: _preBalanceController,
                 ),
-
                 SizedBox(height: width * 0.15),
-                Bbutton(
+                Obx(() => BButton(
                   width: width,
-                  onTap: _saveCustomer,
-                  title: 'Save Customer',
-                ),
+                  onTap: controller.saveCustomer,
+                  title: controller.isLoading.value
+                      ? 'Saving...'
+                      : 'Save Customer',
+                )),
               ],
             ),
           ),
+          Obx(() => controller.isLoading.value
+              ? const Positioned.fill(child: LoadingIndicator())
+              : Container())
         ],
       ),
     );
