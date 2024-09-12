@@ -1,38 +1,25 @@
+import 'package:book_bank/components/widgets/bbutton.dart';
 import 'package:book_bank/firebase/auth.dart';
-import 'package:book_bank/view/main_screen/main_screen.dart';
+import 'package:book_bank/generated/assets.dart';
 import 'package:book_bank/view/sign_up_screen/sign_up_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:validation_plus/validate.dart';
+import 'package:get/get_rx/get_rx.dart';
 
 import '../../components/constant/constant.dart';
-import 'package:book_bank/generated/assets.dart';
-import 'package:flutter/material.dart';
-
 import '../../components/widgets/btextfield.dart';
 import '../../components/widgets/loading_indicator.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatelessWidget {
+  LoginScreen({Key? key}) : super(key: key);
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController email = TextEditingController();
-  TextEditingController password = TextEditingController();
-  String hintText = "xyz01@gmail.com";
-  String labelText = "Email";
-  bool obscureText = true;
-  bool isLoading = false;
-  setLoading(bool value) {
-    setState(() {
-      isLoading = value;
-    });
-  }
+  final controller = Get.find<AuthController>();
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final String hintText = "xyz01@gmail.com";
+  final String labelText = "Email";
+  final RxBool obscureText = true.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -78,22 +65,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: width * 0.05,
                     ),
-                    BTextField(
+                    Obx(() => BTextField(
                       controller: password,
+                      obscureText: obscureText.value,
                       hintText: "pass@11",
                       labelText: "Password",
-                      obscureText: obscureText,
                       suffixIcon: Padding(
                         padding: EdgeInsets.only(top: width * 0.04),
                         child: InkWell(
-                            onTap: () => setState(() {
-                                  obscureText = obscureText ? false : true;
-                                }),
-                            child: FaIcon(obscureText
-                                ? FontAwesomeIcons.eye
-                                : FontAwesomeIcons.eyeSlash)),
+                          onTap: () => obscureText.value =
+                          !obscureText.value,
+                          child: FaIcon(obscureText.value
+                              ? FontAwesomeIcons.eye
+                              : FontAwesomeIcons.eyeSlash),
+                        ),
                       ),
-                    ),
+                    )),
                     SizedBox(
                       height: width * 0.06,
                     ),
@@ -106,16 +93,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: width * 0.1,
                     ),
-                    Bbutton(
-                      onTap: () => Auth.login(
+                    BButton(
+                      onTap: () => controller.login(
                           email: email.text,
                           password: password.text,
                           width: width,
-                          setLoading: (bool value) {
-                            setState(() {
-                              isLoading = value;
-                            });
-                          }),
+                          ),
                       title: "Login Now",
                       width: width,
                     ),
@@ -131,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(color: Colors.grey),
                         ),
                         InkWell(
-                          onTap: () => Get.to(const SignUpScreen()),
+                          onTap: () => Get.to(SignUpScreen()),
                           child: const Text(
                             " SignUp",
                             textAlign: TextAlign.right,
@@ -146,9 +129,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            isLoading
-                ? const Positioned.fill(child: LoadingIndicator())
-                : Container()
+            Obx(() {
+              if (controller.isLoading.isTrue) {
+                return const Positioned.fill(child: LoadingIndicator());
+              } else {
+                return const SizedBox.shrink();
+              }
+            }),
           ],
         ),
       ),

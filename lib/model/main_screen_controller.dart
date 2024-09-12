@@ -1,15 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:book_bank/helper/helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart' ;
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
 
 class MainScreenController extends GetxController {
   var selectedMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(Duration(days: 30))).obs;
@@ -42,7 +44,9 @@ class MainScreenController extends GetxController {
                 return ListTile(
                   title: Text(availableMonths[index]),
                   onTap: () {
+                    isLoading.value = true;
                     selectedMonth.value = availableMonths[index];
+                    isLoading.value = false;
                     Navigator.pop(context);
                   },
                 );
@@ -181,14 +185,22 @@ class MainScreenController extends GetxController {
     return customerData;
   }
 
-  Future<void> fetchAndOpenPdf(BuildContext context) async {
+  Future<void> fetchAndOpenPdf(BuildContext context,String selectedMonth) async {
     setLoading(true);
+    var userDoc = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+    var userData = userDoc.data();
+    String name = "Yousaf Meo";
+    String milkPrice = "220";
+      if(userData != null){
+         name = userData?['name'] ?? '';
+         milkPrice = userData?['milk_price'].toString() ?? "0";
+      }
 
     final Map<String, dynamic> data = {
       "customer_data": await getCustomerData(),
-      "date": "September - 2024",
-      "company_name": "Yousaf Meo",
-      "milk_price_per_liter": 220
+      "date": selectedMonth,
+      "company_name": name,
+      "milk_price_per_liter": milkPrice
     };
 
     try {
@@ -232,6 +244,71 @@ class MainScreenController extends GetxController {
         print("Customer not Deleted $e");
       }
     }
+  }
+
+  void showDeleteOptions(String customerId ,BuildContext context ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Choose Action"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Delete Customer'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  deleteCustomer(customerId);
+                },
+              ),
+              ListTile(
+                title: const Text('Delete Monthly Data'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showMonthlyDataOptions(customerId,context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void showMonthlyDataOptions(String customerId,BuildContext context) async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Fetch the months for this customer
+    QuerySnapshot monthlyDataSnapshot = await firestore
+        .collection('customers')
+        .doc(customerId)
+        .collection('monthly data')
+        .get();
+
+    List<String> months =
+    monthlyDataSnapshot.docs.map((doc) => doc.id).toList();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Select Month to Delete"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: months.map((month) {
+              return ListTile(
+                title: Text(month),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  deleteMonthlyData(customerId, month);
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> deleteMonthlyData(String customerId, String month) async {

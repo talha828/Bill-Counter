@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'firebase_options.dart';
 
 
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: appThemeColor,
         primaryColorDark: appThemeColor,
+
         primarySwatch: createMaterialColor(const Color(0xff6C63FF)),
         textTheme: GoogleFonts.mulishTextTheme(Theme.of(context).textTheme),
         primaryTextTheme:

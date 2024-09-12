@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../components/constant/constant.dart';
 import '../../generated/assets.dart';
 import '../login_screen/login_screen.dart';
@@ -23,7 +23,7 @@ class _CreatePDFInvoiceScreenState extends State<CreatePDFInvoiceScreen> {
           elevation: 0.0,
           backgroundColor: Colors.white,
           onPressed: () {
-            Get.to(const LoginScreen());
+            Get.to(LoginScreen());
           },
           child: const Icon(
             Icons.arrow_forward_ios_outlined,
