@@ -144,94 +144,101 @@ class MainScreen extends StatelessWidget {
                   : await controller.copyCustomerNamesForNewMonth(context))
         ],
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Positioned.fill(child: LoadingIndicator());
-        }
-        return Column(
+      body: Obx((){
+        return Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: controller.searchController,
-                onChanged: (query) => controller.filterCustomers(query),
-                decoration: const InputDecoration(
-                  labelText: 'Search Customers',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: controller.searchController,
+                    onChanged: (query) => controller.filterCustomers(query),
+                    decoration: const InputDecoration(
+                      labelText: 'Search Customers',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream:
+                      FirebaseFirestore.instance.collection('customers').snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+
+                        return ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: controller.filteredCustomers.length,
+                          itemBuilder: (context, index) {
+                            final customer = controller.filteredCustomers[index];
+                            return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                                stream:
+                                controller.getCustomerMonthlyDataStream(customer.id),
+                                builder: (context, monthlyDataSnapshot) {
+                                  if (monthlyDataSnapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const ListTile(
+                                      title: Text('Loading...'),
+                                      subtitle: Text('Fetching data...'),
+                                    );
+                                  }
+
+                                  if (monthlyDataSnapshot.hasError ||
+                                      !monthlyDataSnapshot.hasData ||
+                                      !monthlyDataSnapshot.data!.exists) {
+                                    return Container();
+                                  }
+
+                                  // If data exists, display the relevant data in subtitle
+                                  final data = monthlyDataSnapshot.data!.data();
+                                  double totalMilk =
+                                      double.parse(data!['total_milk'].toString()) ?? 0.0;
+                                  String milkData = data?['summary'] ?? "xx:(0-0):xx";
+                                  String receivedAmount =
+                                      data?['received_amount'].toString() ?? 0.toString();
+                                  String previousAmount =
+                                      data?['previous_amount'].toString() ?? 0.toString();
+
+                                  return _buildCustomerTile(
+                                      customer,
+                                      Text(
+                                        milkData
+                                            .split(":")[1]
+                                            .replaceAll("(", " ")
+                                            .replaceAll(")", " ")
+                                            .replaceAll("-", "--"),
+                                      ),
+                                      Text(
+                                        "${double.parse(totalMilk.toStringAsFixed(2))}L - ${(double.parse(previousAmount) - double.parse(receivedAmount)).toStringAsFixed(0)}",
+                                        style: TextStyle(fontSize: width * 0.05),
+                                      ),
+                                      controller,
+                                      context);
+                                });
+                          },
+                          // separatorBuilder: (context, index) => const Divider(),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream:
-                    FirebaseFirestore.instance.collection('customers').snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
 
-                  return SingleChildScrollView(
-                    child: ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: controller.filteredCustomers.length,
-                        itemBuilder: (context, index) {
-                          final customer = controller.filteredCustomers[index];
-                          return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                              stream:
-                                  controller.getCustomerMonthlyDataStream(customer.id),
-                              builder: (context, monthlyDataSnapshot) {
-                                if (monthlyDataSnapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const ListTile(
-                                    title: Text('Loading...'),
-                                    subtitle: Text('Fetching data...'),
-                                  );
-                                }
+              controller.isLoading.isTrue ?
+                 const Positioned.fill(child: LoadingIndicator())
+                 :const SizedBox.shrink()
 
-                                if (monthlyDataSnapshot.hasError ||
-                                    !monthlyDataSnapshot.hasData ||
-                                    !monthlyDataSnapshot.data!.exists) {
-                                  return Container();
-                                }
-
-                                // If data exists, display the relevant data in subtitle
-                                final data = monthlyDataSnapshot.data!.data();
-                                double totalMilk =
-                                    double.parse(data!['total_milk'].toString()) ?? 0.0;
-                                String milkData = data?['summary'] ?? "xx:(0-0):xx";
-                                String receivedAmount =
-                                    data?['received_amount'].toString() ?? 0.toString();
-                                String previousAmount =
-                                    data?['previous_amount'].toString() ?? 0.toString();
-
-                                return _buildCustomerTile(
-                                    customer,
-                                    Text(
-                                      milkData
-                                          .split(":")[1]
-                                          .replaceAll("(", " ")
-                                          .replaceAll(")", " ")
-                                          .replaceAll("-", "--"),
-                                    ),
-                                    Text(
-                                      "${double.parse(totalMilk.toStringAsFixed(2))}L - ${(double.parse(previousAmount) - double.parse(receivedAmount)).toStringAsFixed(0)}",
-                                      style: TextStyle(fontSize: width * 0.05),
-                                    ),
-                                    controller,
-                                    context);
-                              });
-                        },
-                        // separatorBuilder: (context, index) => const Divider(),
-                      ),
-                  );
-                },
-              ),
-            ),
           ],
         );
       }),
+
       floatingActionButton: FloatingActionButton.extended(
           backgroundColor: appThemeColor,
           onPressed: () async => await controller.fetchAndOpenPdf(
