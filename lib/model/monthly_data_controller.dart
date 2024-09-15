@@ -1,5 +1,6 @@
 import 'package:book_bank/helper/helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -13,6 +14,7 @@ class MonthlyDataController extends GetxController {
   RxBool isLoading = false.obs;
   RxList<List<double>> milkEntries = <List<double>>[].obs;
   RxDouble totalMilk = 0.0.obs;
+  RxDouble milkPrice = 0.0.obs;
 
   MonthlyDataController(this.customerId, this.selectedMonth, this.customerName);
 
@@ -26,7 +28,8 @@ class MonthlyDataController extends GetxController {
 
   // Function to calculate total milk
   void calculateTotal() {
-    totalMilk.value = milkEntries.fold(0.0, (double sum, entry) => sum + entry[0]);
+    totalMilk.value =
+        double.parse(milkEntries.fold(0.0, (double sum, entry) => sum + entry[0]).toStringAsFixed(2));
   }
 
   // Fetch data from Firebase
@@ -38,12 +41,23 @@ class MonthlyDataController extends GetxController {
         .collection('monthly data')
         .doc(selectedMonth)
         .get();
-
+    var userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    var userData = userDoc.data();
+    if (userData != null) {
+      milkPrice.value =
+          double.parse(userData['milk_price'].toString() ?? "210");
+    }
     if (document.exists) {
-      previousAmountController.text = document.get('previous_amount')?.toString() ?? '0';
-      receivedAmountController.text = document.get('received_amount')?.toString() ?? '0';
+      previousAmountController.text =
+          (double.parse(document.get('received_amount')))?.toStringAsFixed(2)  ?? '0';
+      receivedAmountController.text =
+          document.get('received_amount')?.toStringAsFixed(2) ?? '0';
       List<dynamic> entries = document.get('milk_entries') ?? [];
-      milkEntries.value = List.generate(entries.length, (i) => [double.parse(entries[i].toString())]);
+      milkEntries.value = List.generate(
+          entries.length, (i) => [double.parse(entries[i].toStringAsFixed(2))]);
       calculateTotal();
     }
     isLoading.value = false;
@@ -53,7 +67,8 @@ class MonthlyDataController extends GetxController {
   void saveData() async {
     isLoading.value = true;
     List<String> groupedEntries = _groupMilkEntries();
-    String summary = "$customerName:${groupedEntries.join('')}:${int.parse(previousAmountController.text)}";
+    String summary =
+        "$customerName:${groupedEntries.join('')}:${int.parse(double.parse(previousAmountController.text).toStringAsFixed(0))}";
 
     try {
       await FirebaseFirestore.instance
@@ -64,14 +79,12 @@ class MonthlyDataController extends GetxController {
           .update({
         "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
         "total_milk": totalMilk.value,
-        "received_amount": receivedAmountController.text,
-        "previous_amount": previousAmountController.text,
+        "received_amount": double.parse(receivedAmountController.text),
+        "previous_amount": double.parse(previousAmountController.text),
         "summary": summary,
       });
       Get.snackbar("Success", "Data saved successfully!");
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        Get.back();
-      });
+      Get.back();
     } catch (error) {
       Get.snackbar("Error", "Failed to save data: $error");
     } finally {
@@ -104,13 +117,15 @@ class MonthlyDataController extends GetxController {
   void refillPreviousEntry(int index) {
     if (index > 0) {
       milkEntries[index][0] = milkEntries[index - 1][0];
+      Get.forceAppUpdate();
       calculateTotal();
     }
   }
 
   // Edit a specific cell
   void editCell(int index) {
-    TextEditingController controller = TextEditingController(text: milkEntries[index][0].toString());
+    TextEditingController controller =
+        TextEditingController(text: milkEntries[index][0].toString());
     Get.defaultDialog(
       title: "Edit Milk Quantity for Day ${index + 1}",
       content: TextField(
@@ -119,9 +134,19 @@ class MonthlyDataController extends GetxController {
         decoration: const InputDecoration(labelText: 'Milk Quantity (Liters)'),
       ),
       onConfirm: () {
-        milkEntries[index][0] = double.tryParse(controller.text) ?? 0;
-        calculateTotal();
-        Get.back();
+        if (controller.text.isNum) {
+          if (double.parse(controller.text) > 25) {
+            milkEntries[index][0] = double.parse(
+                (double.tryParse(controller.text)! / milkPrice.value)
+                    .toStringAsFixed(2)); // Convert price to milk quantity
+            calculateTotal();
+            Get.back();
+          } else {
+            milkEntries[index][0] = double.tryParse(controller.text) ?? 0;
+            calculateTotal();
+            Get.back();
+          }
+        }
       },
     );
   }

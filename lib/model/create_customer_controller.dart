@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 class CreateCustomerController extends GetxController {
   final nameController = TextEditingController();
-  final preBalanceController = TextEditingController();
+  final preBalanceController = TextEditingController(text: "0");
 
   var isLoading = false.obs; // Observing loading state
   var milkEntries = <List<int>>[].obs; // Observing milk entries
@@ -39,8 +39,8 @@ class CreateCustomerController extends GetxController {
         "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
         "total_milk": 00,
         "received_amount": 00,
-        "previous_amount": preBalanceController.text,
-        "summary": "aa:(0-0):${preBalanceController.text}",
+        "previous_amount": double.parse(preBalanceController.text),
+        "summary": "$name:(0-0):${preBalanceController.text}",
       });
       Get.back(); // Close the screen after saving
     } catch (e) {

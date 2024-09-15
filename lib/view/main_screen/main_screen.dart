@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:book_bank/components/constant/constant.dart';
@@ -15,7 +14,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatelessWidget {
-   MainScreen({super.key});
+  MainScreen({super.key});
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
@@ -24,91 +23,100 @@ class MainScreen extends StatelessWidget {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
       drawer: Drawer(
-        child: StreamBuilder<DocumentSnapshot>(
-          stream: _firestore
-              .collection('users')
-              .doc(_auth.currentUser!.uid)
-              .snapshots(),
-          builder: (context,snapshot){
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator()); // Show loading
-            }
+          child: StreamBuilder<DocumentSnapshot>(
+        stream: _firestore
+            .collection('users')
+            .doc(_auth.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+                child: CircularProgressIndicator()); // Show loading
+          }
 
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Center(child: Text('No User Data Available')); // No data available
-            }
-            final userData = snapshot.data!.data() as Map<String, dynamic>;
-            String userName = userData['name'] ?? 'User Name';
-            String userEmail = userData['email'] ?? 'user@example.com';
-            Uint8List? profileImage = userData['image']?.bytes; // Get the image blob
-            return ListView(
-              padding: const EdgeInsets.all(0),
-              children: [
-                 DrawerHeader(
-                  decoration: const BoxDecoration(
-                    color: appThemeColor,
-                  ), //BoxDecoration
-                  child: UserAccountsDrawerHeader(
-                    margin: EdgeInsets.zero,
-                    decoration: const BoxDecoration(color: appThemeColor),
-                    accountName: Text(
-                      userName,
-                      style: const TextStyle(color: Colors.white,fontSize: 18),
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(
+                child: Text('No User Data Available')); // No data available
+          }
+          final userData = snapshot.data!.data() as Map<String, dynamic>;
+          String userName = userData['name'] ?? 'User Name';
+          String userEmail = userData['email'] ?? 'user@example.com';
+          Uint8List? profileImage =
+              userData['image']?.bytes; // Get the image blob
+          return ListView(
+            padding: const EdgeInsets.all(0),
+            children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  color: appThemeColor,
+                ), //BoxDecoration
+                child: UserAccountsDrawerHeader(
+                  margin: EdgeInsets.zero,
+                  decoration: const BoxDecoration(color: appThemeColor),
+                  accountName: Text(
+                    userName,
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  accountEmail: Text(
+                    userEmail,
+                    style: const TextStyle(
+                      color: Colors.white,
                     ),
-                    accountEmail: Text(userEmail,style: const TextStyle(color: Colors.white,),),
-                    currentAccountPictureSize: Size.fromRadius(width * 0.2),
-                    currentAccountPicture: profileImage != null
-                        ? Container(
-                      margin: EdgeInsets.symmetric(vertical: width * 0.02),
-                          child: CircleAvatar( radius: width * 0.1,
-                                                backgroundImage: MemoryImage(profileImage), // Show the image if available
-                                              ),
+                  ),
+                  currentAccountPictureSize: Size.fromRadius(width * 0.2),
+                  currentAccountPicture: profileImage != null
+                      ? Container(
+                          margin: EdgeInsets.symmetric(vertical: width * 0.02),
+                          child: CircleAvatar(
+                            radius: width * 0.1,
+                            backgroundImage: MemoryImage(
+                                profileImage), // Show the image if available
+                          ),
                         )
-                        : Container(
-                        margin: EdgeInsets.symmetric(vertical: width ),
+                      : Container(
+                          margin: EdgeInsets.symmetric(vertical: width),
                           child: const CircleAvatar(
-                                                backgroundColor: Colors.white,
-                                                child: Text(
-                          "A",
-                          style: TextStyle(fontSize: 30.0, color: Colors.white),
-                                                ),
-                                              ),
+                            backgroundColor: Colors.white,
+                            child: Text(
+                              "A",
+                              style: TextStyle(
+                                  fontSize: 30.0, color: Colors.white),
+                            ),
+                          ),
                         ), //circleAvatar
-                  ), //UserAccountDrawerHeader
-                ), //DrawerHeader
-                ListTile(
-                  leading: const Icon(Icons.person),
-                  title: const Text(' My Profile'),
-                  onTap: () {
-                    Get.to(EditProfileScreen());
-                    // Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.book),
-                  title: const Text('Next Month'),
-                  onTap: ()async {
-                    controller.isLoading.value
-                          ? {}
-                          : await controller.copyCustomerNamesForNewMonth(context);
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: const Text('LogOut'),
-                  onTap: () async{
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    await prefs.setString("email", "null");
-                    await prefs.setString("password", "password");
-                    Get.offAll(LoginScreen());
-                  },
-                ),
-              ],
-            );
-          },
-        )
-      ),
+                ), //UserAccountDrawerHeader
+              ), //DrawerHeader
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text(' My Profile'),
+                onTap: () {
+                  Get.to(const EditProfileScreen());
+                  // Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Create Customer'),
+                onTap: () async {
+                  Get.to(AddCustomerScreen());
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('LogOut'),
+                onTap: () async {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  await prefs.setString("email", "null");
+                  await prefs.setString("password", "password");
+                  Get.offAll(LoginScreen());
+                },
+              ),
+            ],
+          );
+        },
+      )),
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
@@ -130,92 +138,129 @@ class MainScreen extends StatelessWidget {
           //       : await controller.copyCustomerNamesForNewMonth(context),
           // ),
           IconButton(
-              icon: const Icon(Icons.add, color: Colors.white),
-              onPressed: () => controller.isLoading.value
+              icon: const Icon(Icons.copy_outlined, color: Colors.white),
+              onPressed: () async => controller.isLoading.value
                   ? {}
-                  : Get.to(AddCustomerScreen()))
+                  : await controller.copyCustomerNamesForNewMonth(context))
         ],
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Positioned.fill(child: LoadingIndicator());
         }
-        return StreamBuilder<QuerySnapshot>(
-          stream:
-              FirebaseFirestore.instance.collection('customers').snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            final customers = snapshot.data!.docs;
-            return SingleChildScrollView(
-              child: ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: customers.length,
-                itemBuilder: (context, index) {
-                  final customer = customers[index];
-                  return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                      stream:
-                          controller.getCustomerMonthlyDataStream(customer.id),
-                      builder: (context, monthlyDataSnapshot) {
-                        if (monthlyDataSnapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const ListTile(
-                            title: Text('Loading...'),
-                            subtitle: Text('Fetching data...'),
-                          );
-                        }
-              
-                        if (monthlyDataSnapshot.hasError ||
-                            !monthlyDataSnapshot.hasData ||
-                            !monthlyDataSnapshot.data!.exists) {
-                          return Container();
-                        }
-              
-                        // If data exists, display the relevant data in subtitle
-                        final data = monthlyDataSnapshot.data!.data();
-                        double totalMilk = double.parse(data!['total_milk'].toString()) ?? 0.0;
-                        String milkData = data?['summary'] ?? "xx:(0-0):xx";
-                        String receivedAmount = data?['received_amount'].toString() ?? 0.toString();
-                        String previousAmount = data?['previous_amount'].toString() ?? 0.toString();
-              
-                        return _buildCustomerTile(
-                            customer,
-                            Text(
-                              milkData
-                                  .split(":")[1]
-                                  .replaceAll("(", " ")
-                                  .replaceAll(")", " ")
-                                  .replaceAll("-", "--"),
-                            ),
-                            Text(
-                              "${double.parse(totalMilk.toStringAsFixed(2))}L - ${(double.parse(previousAmount) - double.parse(receivedAmount)).toStringAsFixed(0)}",
-                              style: TextStyle(fontSize: width * 0.05),
-                            ),
-                            controller,context);
-                      });
-                },
-                // separatorBuilder: (context, index) => const Divider(),
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: controller.searchController,
+                onChanged: (query) => controller.filterCustomers(query),
+                decoration: const InputDecoration(
+                  labelText: 'Search Customers',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
               ),
-            );
-          },
+            ),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance.collection('customers').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  return SingleChildScrollView(
+                    child: ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: controller.filteredCustomers.length,
+                        itemBuilder: (context, index) {
+                          final customer = controller.filteredCustomers[index];
+                          return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                              stream:
+                                  controller.getCustomerMonthlyDataStream(customer.id),
+                              builder: (context, monthlyDataSnapshot) {
+                                if (monthlyDataSnapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const ListTile(
+                                    title: Text('Loading...'),
+                                    subtitle: Text('Fetching data...'),
+                                  );
+                                }
+
+                                if (monthlyDataSnapshot.hasError ||
+                                    !monthlyDataSnapshot.hasData ||
+                                    !monthlyDataSnapshot.data!.exists) {
+                                  return Container();
+                                }
+
+                                // If data exists, display the relevant data in subtitle
+                                final data = monthlyDataSnapshot.data!.data();
+                                double totalMilk =
+                                    double.parse(data!['total_milk'].toString()) ?? 0.0;
+                                String milkData = data?['summary'] ?? "xx:(0-0):xx";
+                                String receivedAmount =
+                                    data?['received_amount'].toString() ?? 0.toString();
+                                String previousAmount =
+                                    data?['previous_amount'].toString() ?? 0.toString();
+
+                                return _buildCustomerTile(
+                                    customer,
+                                    Text(
+                                      milkData
+                                          .split(":")[1]
+                                          .replaceAll("(", " ")
+                                          .replaceAll(")", " ")
+                                          .replaceAll("-", "--"),
+                                    ),
+                                    Text(
+                                      "${double.parse(totalMilk.toStringAsFixed(2))}L - ${(double.parse(previousAmount) - double.parse(receivedAmount)).toStringAsFixed(0)}",
+                                      style: TextStyle(fontSize: width * 0.05),
+                                    ),
+                                    controller,
+                                    context);
+                              });
+                        },
+                        // separatorBuilder: (context, index) => const Divider(),
+                      ),
+                  );
+                },
+              ),
+            ),
+          ],
         );
       }),
       floatingActionButton: FloatingActionButton.extended(
           backgroundColor: appThemeColor,
-          onPressed: ()async=> controller.fetchAndOpenPdf(context,controller.selectedMonth.value), label: Row(children: [Text("Generate Invoice",style: TextStyle(color: Colors.white),),SizedBox(width: width*0.02,),Icon(Icons.play_arrow_outlined,color: Colors.white,)],)),
+          onPressed: () async => await controller.fetchAndOpenPdf(
+              context, controller.selectedMonth.value),
+          label: Row(
+            children: [
+              Text(
+                "Generate Invoice",
+                style: TextStyle(color: Colors.white),
+              ),
+              SizedBox(
+                width: width * 0.02,
+              ),
+              Icon(
+                Icons.play_arrow_outlined,
+                color: Colors.white,
+              )
+            ],
+          )),
     );
   }
 
   Widget _buildCustomerTile(DocumentSnapshot customer, Widget subtitle,
       Widget trailing, MainScreenController controller, BuildContext context) {
-    return  ListTile(
+    return ListTile(
       title: Text(customer['name'].toString().toUpperCase()),
       subtitle: subtitle,
       trailing: trailing,
-      onLongPress:()=> controller.showDeleteOptions(customer.id,context),
+      onLongPress: () => controller.showDeleteOptions(customer.id, context),
       onTap: () => Get.to(MonthlyDataInputScreen(
           customerId: customer.id,
           selectedMonth: controller.selectedMonth.value,

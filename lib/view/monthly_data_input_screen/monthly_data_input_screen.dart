@@ -38,6 +38,7 @@ class MonthlyDataInputScreen extends StatelessWidget {
                     BTextField(
                       controller: controller.previousAmountController,
                       hintText: "27000",
+                      keyboardType: TextInputType.number,
                       labelText: "Previous Amount",
                       obscureText: false,
                     ),
@@ -46,6 +47,7 @@ class MonthlyDataInputScreen extends StatelessWidget {
                     BTextField(
                       controller: controller.receivedAmountController,
                       hintText: "1000",
+                      keyboardType: TextInputType.number,
                       labelText: "Received Amount",
                       obscureText: false,
                     ),

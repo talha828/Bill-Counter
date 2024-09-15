@@ -18,10 +18,14 @@ class MainScreenController extends GetxController {
   var availableMonths = <String>[].obs;
   var milkEntries = <List<int>>[].obs;
   var isLoading = false.obs;
+  var customersList = <QueryDocumentSnapshot>[].obs;
+  var filteredCustomers = <QueryDocumentSnapshot>[].obs;
+  TextEditingController searchController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
+    fetchCustomers();
     _loadAvailableMonths(); // Load months when the screen starts
   }
 
@@ -70,10 +74,10 @@ class MainScreenController extends GetxController {
     QuerySnapshot snapshot = await firestore.collection('customers').get();
     Set<String> months = {};
 
-    for (var doc in snapshot.docs) {
+    for (int i=0;i<5;i++) {
       QuerySnapshot monthlyDataSnapshot = await firestore
           .collection('customers')
-          .doc(doc.id)
+          .doc(snapshot.docs[i].id)
           .collection("monthly data")
           .get();
 
@@ -184,8 +188,29 @@ class MainScreenController extends GetxController {
     }
     return customerData;
   }
+  Future<void> fetchCustomers() async {
+    isLoading(true);
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('customers').get();
+      customersList.value = snapshot.docs;
+      filteredCustomers.value = customersList;
+    } finally {
+      isLoading(false);
+    }
+  }
+  void filterCustomers(String query) {
+    if (query.isEmpty) {
+      filteredCustomers.value = customersList;
+    } else {
+      filteredCustomers.value = customersList
+          .where((customer) =>
+          customer['name'].toString().toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+  }
 
   Future<void> fetchAndOpenPdf(BuildContext context,String selectedMonth) async {
+    print("Start function");
     setLoading(true);
     var userDoc = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
     var userData = userDoc.data();
@@ -200,18 +225,19 @@ class MainScreenController extends GetxController {
       "customer_data": await getCustomerData(),
       "date": selectedMonth,
       "company_name": name,
-      "milk_price_per_liter": milkPrice
+      "milk_price_per_liter": double.parse(milkPrice)
     };
 
     try {
       String url = 'https://flask-api-invoice.onrender.com/api/invoice_pdf';
-
+      print("send request");
+      print(data.toString());
       var response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(data),
       );
-
+      print("get response");
       if (response.statusCode == 200) {
         Directory directory = await getTemporaryDirectory();
         String filePath = '${directory.path}/invoice.pdf';
@@ -222,6 +248,7 @@ class MainScreenController extends GetxController {
         if (kDebugMode) {
           print('Failed to fetch PDF. Status code: ${response.statusCode}');
         }
+        Get.snackbar("Error", "Failed to fetch PDF: ${response.reasonPhrase}");
       }
     } catch (e) {
       if (kDebugMode) {
