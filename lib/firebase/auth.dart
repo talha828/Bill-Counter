@@ -173,11 +173,6 @@ class AuthController extends GetxController {
       // Get the user's UID
       String uid = FirebaseAuth.instance.currentUser!.uid;
 
-      // Initialize an empty image URL
-
-
-
-
       // Update user data in Firestore
       Map<String, dynamic> updateData = {
         'name': name,
