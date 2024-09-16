@@ -26,7 +26,6 @@ class MonthlyDataController extends GetxController {
     fetchData();
   }
 
-  // Function to calculate total milk
   void calculateTotal() {
     totalMilk.value =
         double.parse(milkEntries.fold(0.0, (double sum, entry) => sum + entry[0]).toStringAsFixed(2));
@@ -52,9 +51,9 @@ class MonthlyDataController extends GetxController {
     }
     if (document.exists) {
       previousAmountController.text =
-          (double.parse(document.get('received_amount')))?.toStringAsFixed(2)  ?? '0';
+          (double.parse(document.get('received_amount').toString()))?.toStringAsFixed(2)  ?? '0';
       receivedAmountController.text =
-          document.get('received_amount')?.toStringAsFixed(2) ?? '0';
+          double.parse(document.get('received_amount').toString())?.toStringAsFixed(2) ?? '0';
       List<dynamic> entries = document.get('milk_entries') ?? [];
       milkEntries.value = List.generate(
           entries.length, (i) => [double.parse(entries[i].toStringAsFixed(2))]);
@@ -79,16 +78,16 @@ class MonthlyDataController extends GetxController {
           .update({
         "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
         "total_milk": totalMilk.value,
-        "received_amount": double.parse(receivedAmountController.text),
-        "previous_amount": double.parse(previousAmountController.text),
+        "received_amount": double.parse(receivedAmountController.text).toString(),
+        "previous_amount": double.parse(previousAmountController.text).toString(),
         "summary": summary,
       });
       Get.snackbar("Success", "Data saved successfully!");
-      Get.back();
     } catch (error) {
       Get.snackbar("Error", "Failed to save data: $error");
     } finally {
       isLoading.value = false;
+      Get.back();
     }
   }
 

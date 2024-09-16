@@ -5,6 +5,7 @@ import 'package:book_bank/components/widgets/loading_indicator.dart';
 import 'package:book_bank/model/monthly_data_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 class MonthlyDataInputScreen extends StatelessWidget {
   final String customerId;
   final String selectedMonth;
@@ -24,9 +25,17 @@ class MonthlyDataInputScreen extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
-            leading: IconButton(onPressed: ()=>Navigator.pop(context), icon: const Icon(Icons.arrow_back,color: Colors.white,)),
+              leading: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                  )),
               backgroundColor: appThemeColor,
-              title: Text(customerName.toUpperCase(),style: const TextStyle(color: Colors.white),)),
+              title: Text(
+                customerName.toUpperCase(),
+                style: const TextStyle(color: Colors.white),
+              )),
           body: Stack(
             children: [
               SingleChildScrollView(
@@ -53,11 +62,12 @@ class MonthlyDataInputScreen extends StatelessWidget {
                     ),
                     SizedBox(height: MediaQuery.of(context).size.width * 0.04),
                     // Milk Entries Grid
-                    Obx((){
+                    Obx(() {
                       return GridView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 5,
                           childAspectRatio: 1,
                         ),
@@ -76,13 +86,18 @@ class MonthlyDataInputScreen extends StatelessWidget {
                                   children: [
                                     Text("Day ${index + 1}",
                                         style: TextStyle(
-                                            color: controller.milkEntries[index][0] == 0
+                                            color: controller.milkEntries[index]
+                                                        [0] ==
+                                                    0
                                                 ? Colors.black
                                                 : Colors.white)),
-                                    Text("${controller.milkEntries[index][0]} L",
+                                    Text(
+                                        "${controller.milkEntries[index][0]} L",
                                         style: TextStyle(
                                             fontSize: 18,
-                                            color: controller.milkEntries[index][0] == 0
+                                            color: controller.milkEntries[index]
+                                                        [0] ==
+                                                    0
                                                 ? Colors.black
                                                 : Colors.white)),
                                   ],

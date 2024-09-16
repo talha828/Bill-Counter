@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:book_bank/components/constant/constant.dart';
 import 'package:book_bank/components/widgets/loading_indicator.dart';
 import 'package:book_bank/model/main_screen_controller.dart';
@@ -99,7 +98,7 @@ class MainScreen extends StatelessWidget {
                 title: const Text('Create Customer'),
                 onTap: () async {
                   Get.to(AddCustomerScreen());
-                  Navigator.pop(context);
+                  // Navigator.pop(context);
                 },
               ),
               ListTile(
@@ -121,15 +120,17 @@ class MainScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         backgroundColor: appThemeColor,
-        title: Obx(() => InkWell(
-              onTap: () async => controller.isLoading.value
-                  ? {}
-                  : await controller.showMonthPickerDialog(context),
-              child: Text(
-                controller.selectedMonth.value.replaceAll("20", ""),
-                style: const TextStyle(color: Colors.white),
-              ),
-            )),
+        title: Obx(
+          () => InkWell(
+            onTap: () async => controller.isLoading.value
+                ? {}
+                : await controller.showMonthPickerDialog(context),
+            child: Text(
+              controller.selectedMonth.value.replaceAll("20", ""),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
         actions: [
           // IconButton(
           //   icon: const Icon(Icons.copy, color: Colors.white),
@@ -138,13 +139,14 @@ class MainScreen extends StatelessWidget {
           //       : await controller.copyCustomerNamesForNewMonth(context),
           // ),
           IconButton(
-              icon: const Icon(Icons.copy_outlined, color: Colors.white),
-              onPressed: () async => controller.isLoading.value
-                  ? {}
-                  : await controller.copyCustomerNamesForNewMonth(context))
+            icon: const Icon(Icons.copy_outlined, color: Colors.white),
+            onPressed: () async => controller.isLoading.value
+                ? {}
+                : await controller.copyCustomerNamesForNewMonth(context),
+          ),
         ],
       ),
-      body: Obx((){
+      body: Obx(() {
         return Stack(
           children: [
             Column(
@@ -164,11 +166,13 @@ class MainScreen extends StatelessWidget {
                 Expanded(
                   child: SingleChildScrollView(
                     child: StreamBuilder<QuerySnapshot>(
-                      stream:
-                      FirebaseFirestore.instance.collection('customers').snapshots(),
+                      stream: FirebaseFirestore.instance
+                          .collection('customers')
+                          .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
 
                         return ListView.builder(
@@ -176,10 +180,12 @@ class MainScreen extends StatelessWidget {
                           shrinkWrap: true,
                           itemCount: controller.filteredCustomers.length,
                           itemBuilder: (context, index) {
-                            final customer = controller.filteredCustomers[index];
-                            return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                                stream:
-                                controller.getCustomerMonthlyDataStream(customer.id),
+                            final customer =
+                                controller.filteredCustomers[index];
+                            return StreamBuilder<
+                                    DocumentSnapshot<Map<String, dynamic>>>(
+                                stream: controller
+                                    .getCustomerMonthlyDataStream(customer.id),
                                 builder: (context, monthlyDataSnapshot) {
                                   if (monthlyDataSnapshot.connectionState ==
                                       ConnectionState.waiting) {
@@ -197,13 +203,17 @@ class MainScreen extends StatelessWidget {
 
                                   // If data exists, display the relevant data in subtitle
                                   final data = monthlyDataSnapshot.data!.data();
-                                  double totalMilk =
-                                      double.parse(data!['total_milk'].toString()) ?? 0.0;
-                                  String milkData = data?['summary'] ?? "xx:(0-0):xx";
+                                  double totalMilk = double.parse(
+                                          data!['total_milk'].toString()) ??
+                                      0.0;
+                                  String milkData =
+                                      data?['summary'] ?? "xx:(0-0):xx";
                                   String receivedAmount =
-                                      data?['received_amount'].toString() ?? 0.toString();
+                                      data?['received_amount'].toString() ??
+                                          0.toString();
                                   String previousAmount =
-                                      data?['previous_amount'].toString() ?? 0.toString();
+                                      data?['previous_amount'].toString() ??
+                                          0.toString();
 
                                   return _buildCustomerTile(
                                       customer,
@@ -216,7 +226,8 @@ class MainScreen extends StatelessWidget {
                                       ),
                                       Text(
                                         "${double.parse(totalMilk.toStringAsFixed(2))}L - ${(double.parse(previousAmount) - double.parse(receivedAmount)).toStringAsFixed(0)}",
-                                        style: TextStyle(fontSize: width * 0.05),
+                                        style:
+                                            TextStyle(fontSize: width * 0.05),
                                       ),
                                       controller,
                                       context);
@@ -230,48 +241,51 @@ class MainScreen extends StatelessWidget {
                 ),
               ],
             ),
-
-              controller.isLoading.isTrue ?
-                 const Positioned.fill(child: LoadingIndicator())
-                 :const SizedBox.shrink()
-
+            controller.isLoading.isTrue
+                ? const Positioned.fill(child: LoadingIndicator())
+                : const SizedBox.shrink()
           ],
         );
       }),
-
       floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: appThemeColor,
-          onPressed: () async => await controller.fetchAndOpenPdf(
-              context, controller.selectedMonth.value),
-          label: Row(
-            children: [
-              Text(
-                "Generate Invoice",
-                style: TextStyle(color: Colors.white),
-              ),
-              SizedBox(
-                width: width * 0.02,
-              ),
-              Icon(
-                Icons.play_arrow_outlined,
-                color: Colors.white,
-              )
-            ],
-          )),
+        backgroundColor: appThemeColor,
+        onPressed: () async => await controller.fetchAndOpenPdf(
+            context, controller.selectedMonth.value),
+        label: Row(
+          children: [
+            const Text(
+              "Generate Invoice",
+              style: TextStyle(color: Colors.white),
+            ),
+            SizedBox(
+              width: width * 0.02,
+            ),
+            const Icon(
+              Icons.play_arrow_outlined,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildCustomerTile(DocumentSnapshot customer, Widget subtitle,
       Widget trailing, MainScreenController controller, BuildContext context) {
     return ListTile(
-      title: Text(customer['name'].toString().toUpperCase()),
+      title: Text(
+        customer['name'].toString().toUpperCase(),
+      ),
       subtitle: subtitle,
       trailing: trailing,
       onLongPress: () => controller.showDeleteOptions(customer.id, context),
-      onTap: () => Get.to(MonthlyDataInputScreen(
+      onTap: () => Get.to(
+        MonthlyDataInputScreen(
           customerId: customer.id,
           selectedMonth: controller.selectedMonth.value,
-          customerName: customer['name'])),
+          customerName: customer['name'],
+        ),
+      ),
     );
   }
 }
