@@ -51,9 +51,10 @@ class MonthlyDataController extends GetxController {
     }
     if (document.exists) {
       previousAmountController.text =
-          (double.parse(document.get('received_amount').toString()))?.toStringAsFixed(2)  ?? '0';
+          (double.parse(document.get('previous_amount').toString()))?.toStringAsFixed(2)  ?? '0';
       receivedAmountController.text =
           double.parse(document.get('received_amount').toString())?.toStringAsFixed(2) ?? '0';
+      totalMilk.value = double.parse(document.get('total_milk').toString());
       List<dynamic> entries = document.get('milk_entries') ?? [];
       milkEntries.value = List.generate(
           entries.length, (i) => [double.parse(entries[i].toStringAsFixed(2))]);

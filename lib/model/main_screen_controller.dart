@@ -108,9 +108,13 @@ class MainScreenController extends GetxController {
         setEntriesCount();
         final firestore = FirebaseFirestore.instance;
         final customersSnapshot = await firestore.collection('customers').get();
-
+        double milkPrice = 0.0;
         String previousMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(Duration(days: 30)));
-
+        var userDoc = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+        var userData = userDoc.data();
+        if (userData != null) {
+          milkPrice = double.parse(userData['milk_price'].toString() ?? "0");
+        }
         for (var doc in customersSnapshot.docs) {
           final documentSnapshot = await firestore
               .collection('customers')
@@ -121,8 +125,8 @@ class MainScreenController extends GetxController {
 
           String previousAmount =
               documentSnapshot.data()?['previous_amount']?.toString() ?? '0';
-          String receivedAmount =
-              documentSnapshot.data()?['received_amount']?.toString() ?? '0';
+          String receivedAmount = documentSnapshot.data()?['received_amount']?.toString() ?? '0';
+          double totalMilk = double.parse(documentSnapshot.data()?['total_milk']?.toString() ?? '0');
 
           double newPreviousAmount =
               double.parse(previousAmount) - double.parse(receivedAmount);
@@ -136,7 +140,7 @@ class MainScreenController extends GetxController {
             "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
             "total_milk": 00,
             "received_amount": 00,
-            "previous_amount": int.parse(newPreviousAmount.toStringAsFixed(0)),
+            "previous_amount": ((totalMilk * milkPrice) + newPreviousAmount).toStringAsFixed(0),
             "summary": "${doc['name']}:(0-0):${newPreviousAmount.toStringAsFixed(0)}",
           });
         }
