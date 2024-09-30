@@ -92,7 +92,33 @@ class MainScreenController extends GetxController {
     milkEntries.assignAll(List.generate(
         Helper.getDaysInMonth(selectedMonth.value), (index) => [0]));
   }
+  String getPreviousMonth(String selectedMonth) {
+    // Split the input to extract the month and year
+    List<String> parts = selectedMonth.split(" - ");
+    String currentMonth = parts[0]; // "September"
+    int currentYear = int.parse(parts[1]); // 2024
 
+    // Parse the current month using DateFormat to get the month index
+    DateTime currentDate = DateFormat("MMMM").parse(currentMonth);
+    int monthIndex = currentDate.month;
+
+    // Calculate the previous month and adjust the year if needed
+    int previousMonthIndex = monthIndex - 1;
+    int previousYear = currentYear;
+
+    // If it's January, go to December of the previous year
+    if (previousMonthIndex == 0) {
+      previousMonthIndex = 12;
+      previousYear--;
+    }
+
+    // Create a DateTime object for the previous month
+    DateTime previousDate = DateTime(previousYear, previousMonthIndex);
+
+    // Format the previous month back to "Month - Year"
+    String previousMonthFormatted = DateFormat('MMMM').format(previousDate);
+    return "$previousMonthFormatted - $previousYear";
+  }
   Future<void> copyCustomerNamesForNewMonth(BuildContext context) async {
     setLoading(true);
     try {
@@ -109,7 +135,7 @@ class MainScreenController extends GetxController {
         final firestore = FirebaseFirestore.instance;
         final customersSnapshot = await firestore.collection('customers').get();
         double milkPrice = 0.0;
-        String previousMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(Duration(days: 30)));
+        String previousMonth =  getPreviousMonth(selectedMonth.value);
         var userDoc = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
         var userData = userDoc.data();
         if (userData != null) {

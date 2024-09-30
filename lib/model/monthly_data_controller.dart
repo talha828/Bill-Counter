@@ -105,7 +105,7 @@ class MonthlyDataController extends GetxController {
       } else {
         groupedEntries.add("($currentQuantity-${startDay + count - 1})");
         currentQuantity = milkEntries[i][0];
-        startDay = i + 1;
+        startDay = 1;
         count = 1;
       }
     }
