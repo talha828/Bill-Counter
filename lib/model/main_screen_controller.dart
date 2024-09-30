@@ -14,7 +14,7 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MainScreenController extends GetxController {
-  var selectedMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(Duration(days: 30))).obs;
+  var selectedMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(const Duration(days: 15))).obs;
   var availableMonths = <String>[].obs;
   var milkEntries = <List<int>>[].obs;
   var isLoading = false.obs;
