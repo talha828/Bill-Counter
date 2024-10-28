@@ -68,7 +68,7 @@ class MonthlyDataController extends GetxController {
     isLoading.value = true;
     List<String> groupedEntries = _groupMilkEntries();
     String summary =
-        "$customerName:${groupedEntries.join('')}:${int.parse(double.parse(previousAmountController.text).toStringAsFixed(0))}";
+        "$customerName:${groupedEntries.join('')}:${int.parse((double.parse(previousAmountController.text)-double.parse(receivedAmountController.text.toString())).toStringAsFixed(0))}";
 
     try {
       await FirebaseFirestore.instance
