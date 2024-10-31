@@ -2,19 +2,22 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:book_bank/helper/helper.dart';
+import 'package:book_bank/view/customer_selection_screen/customer_selection_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart' ;
+import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MainScreenController extends GetxController {
-  var selectedMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(const Duration(days: 15))).obs;
+  var selectedMonth = DateFormat('MMMM - yyyy')
+      .format(DateTime.now().subtract(const Duration(days: 15)))
+      .obs;
   var availableMonths = <String>[].obs;
   var milkEntries = <List<int>>[].obs;
   var isLoading = false.obs;
@@ -74,7 +77,7 @@ class MainScreenController extends GetxController {
     QuerySnapshot snapshot = await firestore.collection('customers').get();
     Set<String> months = {};
 
-    for (int i=0;i<5;i++) {
+    for (int i = 0; i < 5; i++) {
       QuerySnapshot monthlyDataSnapshot = await firestore
           .collection('customers')
           .doc(snapshot.docs[i].id)
@@ -92,6 +95,7 @@ class MainScreenController extends GetxController {
     milkEntries.assignAll(List.generate(
         Helper.getDaysInMonth(selectedMonth.value), (index) => [0]));
   }
+
   String getPreviousMonth(String selectedMonth) {
     // Split the input to extract the month and year
     List<String> parts = selectedMonth.split(" - ");
@@ -119,6 +123,7 @@ class MainScreenController extends GetxController {
     String previousMonthFormatted = DateFormat('MMMM').format(previousDate);
     return "$previousMonthFormatted - $previousYear";
   }
+
   Future<void> copyCustomerNamesForNewMonth(BuildContext context) async {
     setLoading(true);
     try {
@@ -135,8 +140,11 @@ class MainScreenController extends GetxController {
         final firestore = FirebaseFirestore.instance;
         final customersSnapshot = await firestore.collection('customers').get();
         double milkPrice = 0.0;
-        String previousMonth =  getPreviousMonth(selectedMonth.value);
-        var userDoc = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+        String previousMonth = getPreviousMonth(selectedMonth.value);
+        var userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
         var userData = userDoc.data();
         if (userData != null) {
           milkPrice = double.parse(userData['milk_price'].toString() ?? "0");
@@ -151,8 +159,10 @@ class MainScreenController extends GetxController {
 
           String previousAmount =
               documentSnapshot.data()?['previous_amount']?.toString() ?? '0';
-          String receivedAmount = documentSnapshot.data()?['received_amount']?.toString() ?? '0';
-          double totalMilk = double.parse(documentSnapshot.data()?['total_milk']?.toString() ?? '0');
+          String receivedAmount =
+              documentSnapshot.data()?['received_amount']?.toString() ?? '0';
+          double totalMilk = double.parse(
+              documentSnapshot.data()?['total_milk']?.toString() ?? '0');
 
           double newPreviousAmount =
               double.parse(previousAmount) - double.parse(receivedAmount);
@@ -166,8 +176,10 @@ class MainScreenController extends GetxController {
             "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
             "total_milk": 00,
             "received_amount": 00,
-            "previous_amount": ((totalMilk * milkPrice) + newPreviousAmount).toStringAsFixed(0),
-            "summary": "${doc['name']}:(0-0):${newPreviousAmount.toStringAsFixed(0)}",
+            "previous_amount": ((totalMilk * milkPrice) + newPreviousAmount)
+                .toStringAsFixed(0),
+            "summary":
+                "${doc['name']}:(0-0):${newPreviousAmount.toStringAsFixed(0)}",
           });
         }
       }
@@ -181,7 +193,8 @@ class MainScreenController extends GetxController {
     }
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> getCustomerMonthlyDataStream(String customerId) {
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getCustomerMonthlyDataStream(
+      String customerId) {
     final firestore = FirebaseFirestore.instance;
     return firestore
         .collection('customers')
@@ -190,7 +203,6 @@ class MainScreenController extends GetxController {
         .doc(selectedMonth.value)
         .snapshots();
   }
-
 
   Future<List<String>> getCustomerData() async {
     final firestore = FirebaseFirestore.instance;
@@ -207,7 +219,9 @@ class MainScreenController extends GetxController {
             .doc(selectedMonth.value)
             .get();
 
-        if (summary.exists && summary.data() != null && summary.data()!.containsKey('summary')) {
+        if (summary.exists &&
+            summary.data() != null &&
+            summary.data()!.containsKey('summary')) {
           customerData.add(summary['summary'].toString());
         }
       } catch (e) {
@@ -218,38 +232,48 @@ class MainScreenController extends GetxController {
     }
     return customerData;
   }
+
   Future<void> fetchCustomers() async {
     isLoading(true);
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('customers').get();
+      final snapshot =
+          await FirebaseFirestore.instance.collection('customers').get();
       customersList.value = snapshot.docs;
       filteredCustomers.value = customersList;
     } finally {
       isLoading(false);
     }
   }
+
   void filterCustomers(String query) {
     if (query.isEmpty) {
       filteredCustomers.value = customersList;
     } else {
       filteredCustomers.value = customersList
-          .where((customer) =>
-          customer['name'].toString().toLowerCase().contains(query.toLowerCase()))
+          .where((customer) => customer['name']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
           .toList();
     }
   }
 
-  Future<void> fetchAndOpenPdf(BuildContext context,String selectedMonth) async {
-    print("Start function");
+  Future<void> fetchAndOpenSummaryPdf(
+      BuildContext context, String selectedMonth) async {
+    print("Start summary function");
     setLoading(true);
-    var userDoc = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+    var userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
     var userData = userDoc.data();
     String name = "Yousaf Meo";
     String milkPrice = "220";
-      if(userData != null){
-         name = userData?['name'] ?? '';
-         milkPrice = userData?['milk_price'].toString() ?? "0";
-      }
+
+    if (userData != null) {
+      name = userData['name'] ?? '';
+      milkPrice = userData['milk_price'].toString() ?? "0";
+    }
 
     final Map<String, dynamic> data = {
       "customer_data": await getCustomerData(),
@@ -259,34 +283,84 @@ class MainScreenController extends GetxController {
     };
 
     try {
-      String url = 'https://flask-api-invoice.onrender.com/api/invoice_pdf';
-      print("send request");
-      print(data.toString());
+      String url = 'https://flask-api-invoice.onrender.com/api/summary_pdf';
       var response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(data),
       );
-      print("get response");
+
       if (response.statusCode == 200) {
         Directory directory = await getTemporaryDirectory();
-        String filePath = '${directory.path}/invoice.pdf';
+        String filePath = '${directory.path}/summary.pdf';
         File file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
         OpenFile.open(filePath);
       } else {
-        if (kDebugMode) {
-          print('Failed to fetch PDF. Status code: ${response.statusCode}');
-        }
         Get.snackbar("Error", "Failed to fetch PDF: ${response.reasonPhrase}");
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Error: $e');
-      }
+      print('Error: $e');
     } finally {
       setLoading(false);
     }
+  }
+
+  Future<void> fetchAndOpenInvoicePdf(
+      BuildContext context, String selectedMonth) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CustomerSelectionScreen(
+          selectedMonth: selectedMonth,
+          onSelectedCustomers: (List<String> selectedCustomerData) async {
+            // Get company name and milk price
+            setLoading(true);
+            var userDoc = await FirebaseFirestore.instance
+                .collection('users')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .get();
+            var userData = userDoc.data();
+            String name = userData?['name'] ?? "Yousaf Meo";
+            String milkPrice = userData?['milk_price'].toString() ?? "0";
+
+            final Map<String, dynamic> data = {
+              "customer_data": selectedCustomerData,
+              "date": selectedMonth,
+              "company_name": name,
+              "milk_price_per_liter": double.parse(milkPrice)
+            };
+
+            try {
+              String url =
+                  'https://flask-api-invoice.onrender.com/api/invoice_pdf';
+              var response = await http.post(
+                Uri.parse(url),
+                headers: {"Content-Type": "application/json"},
+                body: jsonEncode(data),
+              );
+
+              if (response.statusCode == 200) {
+                Directory directory = await getTemporaryDirectory();
+                String filePath = '${directory.path}/invoice.pdf';
+                File file = File(filePath);
+                await file.writeAsBytes(response.bodyBytes);
+                OpenFile.open(filePath);
+              } else {
+                setLoading(false);
+                Get.snackbar(
+                    "Error", "Failed to fetch PDF: ${response.reasonPhrase}");
+              }
+            } catch (e) {
+              setLoading(false);
+              print('Error: $e');
+            } finally {
+              setLoading(false);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> deleteCustomer(String customerId) async {
@@ -303,7 +377,7 @@ class MainScreenController extends GetxController {
     }
   }
 
-  void showDeleteOptions(String customerId ,BuildContext context ) {
+  void showDeleteOptions(String customerId, BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -323,7 +397,7 @@ class MainScreenController extends GetxController {
                 title: const Text('Delete Monthly Data'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  showMonthlyDataOptions(customerId,context);
+                  showMonthlyDataOptions(customerId, context);
                 },
               ),
             ],
@@ -333,7 +407,7 @@ class MainScreenController extends GetxController {
     );
   }
 
-  void showMonthlyDataOptions(String customerId,BuildContext context) async {
+  void showMonthlyDataOptions(String customerId, BuildContext context) async {
     final firestore = FirebaseFirestore.instance;
 
     // Fetch the months for this customer
@@ -344,7 +418,7 @@ class MainScreenController extends GetxController {
         .get();
 
     List<String> months =
-    monthlyDataSnapshot.docs.map((doc) => doc.id).toList();
+        monthlyDataSnapshot.docs.map((doc) => doc.id).toList();
 
     showDialog(
       context: context,
@@ -371,7 +445,12 @@ class MainScreenController extends GetxController {
   Future<void> deleteMonthlyData(String customerId, String month) async {
     final firestore = FirebaseFirestore.instance;
     try {
-      await firestore.collection('customers').doc(customerId).collection('monthly data').doc(month).delete();
+      await firestore
+          .collection('customers')
+          .doc(customerId)
+          .collection('monthly data')
+          .doc(month)
+          .delete();
       if (kDebugMode) {
         print("Monthly data for $month deleted successfully.");
       }

@@ -102,6 +102,13 @@ class MainScreen extends StatelessWidget {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Start New Month'),
+                onTap:() async => controller.isLoading.value
+                    ? {}
+                    : await controller.copyCustomerNamesForNewMonth(context),
+              ),
+              ListTile(
                 leading: const Icon(Icons.logout),
                 title: const Text('LogOut'),
                 onTap: () async {
@@ -139,10 +146,8 @@ class MainScreen extends StatelessWidget {
           //       : await controller.copyCustomerNamesForNewMonth(context),
           // ),
           IconButton(
-            icon: const Icon(Icons.copy_outlined, color: Colors.white),
-            onPressed: () async => controller.isLoading.value
-                ? {}
-                : await controller.copyCustomerNamesForNewMonth(context),
+            icon: const Icon(Icons.arrow_forward, color: Colors.white),
+            onPressed: ()=> controller.fetchAndOpenInvoicePdf(context,controller.selectedMonth.value)
           ),
         ],
       ),
@@ -249,12 +254,12 @@ class MainScreen extends StatelessWidget {
       }),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: appThemeColor,
-        onPressed: () async => await controller.fetchAndOpenPdf(
+        onPressed: () async => await controller.fetchAndOpenSummaryPdf(
             context, controller.selectedMonth.value),
         label: Row(
           children: [
             const Text(
-              "Generate Invoice",
+              "Generate Summary",
               style: TextStyle(color: Colors.white),
             ),
             SizedBox(
