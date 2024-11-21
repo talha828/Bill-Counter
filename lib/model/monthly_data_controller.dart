@@ -1,13 +1,14 @@
 import 'package:book_bank/helper/helper.dart';
+import 'package:book_bank/model/customer_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MonthlyDataController extends GetxController {
-  final String customerId;
+  final CustomerModel customer;
   final String selectedMonth;
-  final String customerName;
+
 
   final previousAmountController = TextEditingController();
   final receivedAmountController = TextEditingController();
@@ -16,7 +17,7 @@ class MonthlyDataController extends GetxController {
   RxDouble totalMilk = 0.0.obs;
   RxDouble milkPrice = 0.0.obs;
 
-  MonthlyDataController(this.customerId, this.selectedMonth, this.customerName);
+  MonthlyDataController(this.customer, this.selectedMonth);
 
   @override
   void onInit() {
@@ -36,7 +37,7 @@ class MonthlyDataController extends GetxController {
     isLoading.value = true;
     DocumentSnapshot document = await FirebaseFirestore.instance
         .collection('customers')
-        .doc(customerId)
+        .doc(customer.id)
         .collection('monthly data')
         .doc(selectedMonth)
         .get();
@@ -68,19 +69,19 @@ class MonthlyDataController extends GetxController {
     isLoading.value = true;
     List<String> groupedEntries = _groupMilkEntries();
     String summary =
-        "$customerName:${groupedEntries.join('')}:${int.parse((double.parse(previousAmountController.text)-double.parse(receivedAmountController.text.toString())).toStringAsFixed(0))}";
+        "${customer.name}:${groupedEntries.join('')}:${int.parse((double.parse(previousAmountController.text)-double.parse(receivedAmountController.text.toString())).toStringAsFixed(0))}";
 
     try {
       await FirebaseFirestore.instance
           .collection('customers')
-          .doc(customerId)
+          .doc(customer.id)
           .collection('monthly data')
           .doc(selectedMonth)
           .update({
         "milk_entries": milkEntries.map((entry) => entry[0]).toList(),
         "total_milk": totalMilk.value,
-        "received_amount": double.parse(receivedAmountController.text).toString(),
-        "previous_amount": double.parse(previousAmountController.text).toString(),
+        "received_amount": double.parse((receivedAmountController.text ?? 0).toString()).toString(),
+        "previous_amount": double.parse((previousAmountController.text ?? 0).toString()).toString(),
         "summary": summary,
       });
       Get.snackbar("Success", "Data saved successfully!");

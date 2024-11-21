@@ -3,7 +3,6 @@ import 'package:book_bank/components/widgets/loading_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class CustomerSelectionScreen extends StatefulWidget {
   final String selectedMonth;

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 class CreateCustomerController extends GetxController {
   final nameController = TextEditingController();
+  final phoneNumberController = TextEditingController();
   final preBalanceController = TextEditingController(text: "0");
 
   var isLoading = false.obs; // Observing loading state
@@ -26,9 +27,11 @@ class CreateCustomerController extends GetxController {
   void saveCustomer() async {
     isLoading.value = true;
     String name = nameController.text;
+    String number = phoneNumberController.text.isEmpty ?"+92xxx" :phoneNumberController.text;
     try {
       DocumentReference customerDoc = await FirebaseFirestore.instance.collection('customers').add({
         'name': name,
+        'number': number,
       });
       await FirebaseFirestore.instance
           .collection('customers')

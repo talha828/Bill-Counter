@@ -76,17 +76,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         appBar:AppBar(
             leading: IconButton(onPressed: ()=>Navigator.pop(context), icon: const Icon(Icons.arrow_back,color: Colors.white,)),
             backgroundColor: appThemeColor,
-            title: Text("Edit Profile",style: const TextStyle(color: Colors.white),)),
+            title: const Text("Edit Profile",style:  TextStyle(color: Colors.white),),),
         body: Stack(
           children: [
             SingleChildScrollView(
               padding: EdgeInsets.symmetric(vertical: width * 0.04, horizontal: width * 0.04),
-              child: Container(
+              child: SizedBox(
                 height: height,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(height: width * 0.1),
+                    SizedBox(height: width * 0.05),
+
                     InkWell(
                       onTap: () async {
                         final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -97,15 +98,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           });
                         }
                       },
-                      child: CircleAvatar(
-                        radius: width * 0.22,
-                        backgroundColor: Colors.grey,
-                        backgroundImage: imageFile != null
-                            ? MemoryImage(imageFile!)
-                            : const AssetImage(Assets.imgProfile) as ImageProvider,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: SizedBox(
+                          height: width * 0.5,
+                          child: imageFile != null
+                              ? Image.memory(imageFile!,fit: BoxFit.fill,)
+                              :  Image.asset(Assets.imgProfile) ,
+                        ),
                       ),
                     ),
-                    SizedBox(height: width * 0.1),
+                    SizedBox(height: width * 0.05),
+                    Text(
+                      "Profile Details",
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: width * 0.06),
+                    ),
+                    SizedBox(height: width * 0.05),
                     BTextField(
                       obscureText: false,
                       controller: name,
@@ -113,11 +123,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       labelText: "Name",
                     ),
                     SizedBox(height: width * 0.04),
-                    BTextField(
-                      obscureText: false,
-                      controller: email,
-                      hintText: "Your Email",
-                      labelText: "Email",
+                    IgnorePointer(
+                      ignoring: true,
+                      child: BTextField(
+                        obscureText: false,
+                        controller: email,
+                        hintText: "Your Email",
+                        labelText: "Email",
+                      ),
                     ),
                     SizedBox(height: width * 0.04),
                     BTextField(

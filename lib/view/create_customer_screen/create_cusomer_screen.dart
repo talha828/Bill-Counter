@@ -37,6 +37,13 @@ class AddCustomerScreen extends StatelessWidget {
                 ),
                 SizedBox(height: width * 0.04),
                 BTextField(
+                  controller: controller.phoneNumberController,
+                  hintText: "+923012070720",
+                  labelText: "Whatsapp Number",
+                  obscureText: false,
+                ),
+                SizedBox(height: width * 0.04),
+                BTextField(
                   controller: controller.preBalanceController,
                   hintText: "1000",
                   labelText: "Previous Balance",

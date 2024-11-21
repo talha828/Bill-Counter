@@ -2,26 +2,27 @@ import 'package:book_bank/components/constant/constant.dart';
 import 'package:book_bank/components/widgets/bbutton.dart';
 import 'package:book_bank/components/widgets/btextfield.dart';
 import 'package:book_bank/components/widgets/loading_indicator.dart';
+import 'package:book_bank/model/customer_model.dart';
 import 'package:book_bank/model/monthly_data_controller.dart';
+import 'package:book_bank/view/edit_customer_screen/edit_customer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MonthlyDataInputScreen extends StatelessWidget {
-  final String customerId;
+  final CustomerModel customer;
   final String selectedMonth;
-  final String customerName;
+
 
   const MonthlyDataInputScreen({
     super.key,
-    required this.customerId,
+    required this.customer,
     required this.selectedMonth,
-    required this.customerName,
   });
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<MonthlyDataController>(
-      init: MonthlyDataController(customerId, selectedMonth, customerName),
+      init: MonthlyDataController(customer, selectedMonth),
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
@@ -33,9 +34,16 @@ class MonthlyDataInputScreen extends StatelessWidget {
                   )),
               backgroundColor: appThemeColor,
               title: Text(
-                customerName.toUpperCase(),
+                customer.name.toUpperCase(),
                 style: const TextStyle(color: Colors.white),
-              )),
+              ),
+          actions: [
+            IconButton(
+                icon: const Icon(Icons.edit, color: Colors.white),
+                onPressed: ()=>Get.to(EditCustomerScreen(customer:customer)),
+            ),
+          ],
+          ),
           body: Stack(
             children: [
               SingleChildScrollView(
@@ -68,8 +76,8 @@ class MonthlyDataInputScreen extends StatelessWidget {
                         shrinkWrap: true,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 5,
-                          childAspectRatio: 1,
+                          crossAxisCount: 4,
+                          childAspectRatio: 1.5,
                         ),
                         itemCount: controller.milkEntries.length,
                         itemBuilder: (context, index) {
@@ -77,9 +85,17 @@ class MonthlyDataInputScreen extends StatelessWidget {
                             onTap: () => controller.refillPreviousEntry(index),
                             onDoubleTap: () => controller.editCell(index),
                             child: Container(
-                              color: controller.milkEntries[index][0] == 0
-                                  ? Colors.white
-                                  : appThemeColor.withOpacity(0.5),
+                              margin: EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: controller.milkEntries[index][0] == 0
+                                    ? appThemeColor.withOpacity(0.5): Colors.white
+                                    ,),
+                                color: controller.milkEntries[index][0] == 0
+                                    ? Colors.white
+                                    : appThemeColor.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(5)
+                              ),
+                              
                               child: Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -108,7 +124,7 @@ class MonthlyDataInputScreen extends StatelessWidget {
                         },
                       );
                     }),
-                    SizedBox(height: MediaQuery.of(context).size.width * 0.04),
+                    SizedBox(height: MediaQuery.of(context).size.width * 0.07),
                     // Save Button
                     BButton(
                       onTap: controller.saveData,

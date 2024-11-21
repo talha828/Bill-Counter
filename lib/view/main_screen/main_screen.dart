@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:book_bank/components/constant/constant.dart';
 import 'package:book_bank/components/widgets/loading_indicator.dart';
+import 'package:book_bank/model/customer_model.dart';
 import 'package:book_bank/model/main_screen_controller.dart';
 import 'package:book_bank/view/create_customer_screen/create_cusomer_screen.dart';
 import 'package:book_bank/view/edit_profile_screen/edit_profile_screen.dart';
@@ -286,9 +287,8 @@ class MainScreen extends StatelessWidget {
       onLongPress: () => controller.showDeleteOptions(customer.id, context),
       onTap: () => Get.to(
         MonthlyDataInputScreen(
-          customerId: customer.id,
+          customer: CustomerModel(id:customer.id ,name:customer['name'] ,phoneNumber: "+92xxx",),
           selectedMonth: controller.selectedMonth.value,
-          customerName: customer['name'],
         ),
       ),
     );
