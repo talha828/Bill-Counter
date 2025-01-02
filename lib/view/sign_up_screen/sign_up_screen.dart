@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/widgets/btextfield.dart';
 import '../../components/widgets/loading_indicator.dart';
+
 class SignUpScreen extends StatelessWidget {
   SignUpScreen({Key? key}) : super(key: key);
 
@@ -42,26 +43,38 @@ class SignUpScreen extends StatelessWidget {
                   children: [
                     SizedBox(height: width * 0.1),
                     // Profile Image Section
-                    Obx(() => InkWell(
-                      onTap: () async {
-                        final XFile? image = await _picker.pickImage(
-                            source: ImageSource.gallery);
-                        if (image != null) {
-                          file.value = File(image.path);
-                        }
-                      },
-                      child: file.value == null
-                          ? Image.asset(
-                        Assets.imgProfile,
-                        width: width * 0.4,
-                        height: width * 0.4,
-                      )
-                          : CircleAvatar(
-                        radius: width * 0.22,
-                        backgroundImage:
-                        FileImage(file.value!),
+                    Obx(
+                      () => InkWell(
+                        onTap: () async {
+                          final XFile? image = await _picker.pickImage(
+                              source: ImageSource.gallery);
+                          if (image != null) {
+                            file.value = File(image.path);
+                          }
+                        },
+                        child: file.value == null
+                            ? Image.asset(
+                                Assets.imgProfile,
+                                width: width * 0.4,
+                                height: width * 0.4,
+                              )
+                            : Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: width * 0.2),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Container(
+                                    color: Colors.black,
+                                    height: width * 0.5,
+                                    child: Image.file(
+                                      file.value!,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                            ),
                       ),
-                    )),
+                    ),
                     SizedBox(height: width * 0.1),
                     // Sign Up Text
                     Text(
@@ -90,29 +103,29 @@ class SignUpScreen extends StatelessWidget {
                     SizedBox(height: width * 0.04),
                     // Password Input Field with Toggle
                     Obx(() => BTextField(
-                      controller: password,
-                      obscureText: obscureText.value,
-                      hintText: "pass@11",
-                      labelText: "Password",
-                      suffixIcon: Padding(
-                        padding: EdgeInsets.only(top: width * 0.04),
-                        child: InkWell(
-                          onTap: () => obscureText.value =
-                          !obscureText.value,
-                          child: FaIcon(obscureText.value
-                              ? FontAwesomeIcons.eye
-                              : FontAwesomeIcons.eyeSlash),
-                        ),
-                      ),
-                    )),
+                          controller: password,
+                          obscureText: obscureText.value,
+                          hintText: "pass@11",
+                          labelText: "Password",
+                          suffixIcon: Padding(
+                            padding: EdgeInsets.only(top: width * 0.04),
+                            child: InkWell(
+                              onTap: () =>
+                                  obscureText.value = !obscureText.value,
+                              child: FaIcon(obscureText.value
+                                  ? FontAwesomeIcons.eye
+                                  : FontAwesomeIcons.eyeSlash),
+                            ),
+                          ),
+                        )),
                     SizedBox(height: width * 0.04),
                     // Confirm Password Input Field
                     Obx(() => BTextField(
-                      obscureText: obscureText.value,
-                      controller: confirmPassword,
-                      hintText: "pass@11",
-                      labelText: "Confirm Password",
-                    )),
+                          obscureText: obscureText.value,
+                          controller: confirmPassword,
+                          hintText: "pass@11",
+                          labelText: "Confirm Password",
+                        )),
                     SizedBox(height: width * 0.1),
                     // Sign Up Button
                     BButton(

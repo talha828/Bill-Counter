@@ -1,3 +1,4 @@
+import 'package:book_bank/components/constant/constant.dart';
 import 'package:book_bank/helper/helper.dart';
 import 'package:book_bank/model/customer_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,7 +37,7 @@ class MonthlyDataController extends GetxController {
   void fetchData() async {
     isLoading.value = true;
     DocumentSnapshot document = await FirebaseFirestore.instance
-        .collection('customers')
+        .collection(email)
         .doc(customer.id)
         .collection('monthly data')
         .doc(selectedMonth)
@@ -73,7 +74,7 @@ class MonthlyDataController extends GetxController {
 
     try {
       await FirebaseFirestore.instance
-          .collection('customers')
+          .collection(email)
           .doc(customer.id)
           .collection('monthly data')
           .doc(selectedMonth)

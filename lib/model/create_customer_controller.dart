@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../components/constant/constant.dart';
+
 class CreateCustomerController extends GetxController {
   final nameController = TextEditingController();
   final phoneNumberController = TextEditingController();
@@ -29,12 +31,12 @@ class CreateCustomerController extends GetxController {
     String name = nameController.text;
     String number = phoneNumberController.text.isEmpty ?"+92xxx" :phoneNumberController.text;
     try {
-      DocumentReference customerDoc = await FirebaseFirestore.instance.collection('customers').add({
+      DocumentReference customerDoc = await FirebaseFirestore.instance.collection(email).add({
         'name': name,
         'number': number,
       });
       await FirebaseFirestore.instance
-          .collection('customers')
+          .collection(email)
           .doc(customerDoc.id)
           .collection('monthly data')
           .doc(Helper.getCurrentDateFormatted())

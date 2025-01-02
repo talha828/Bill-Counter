@@ -31,12 +31,12 @@ class _CustomerSelectionScreenState extends State<CustomerSelectionScreen> {
     final firestore = FirebaseFirestore.instance;
     List<String> customerData = [];
 
-    QuerySnapshot snapshot = await firestore.collection('customers').get();
+    QuerySnapshot snapshot = await firestore.collection(email).get();
 
     for (var doc in snapshot.docs) {
       try {
         DocumentSnapshot<Map<String, dynamic>> summary = await firestore
-            .collection('customers')
+            .collection(email)
             .doc(doc.id)
             .collection("monthly data")
             .doc(widget.selectedMonth)

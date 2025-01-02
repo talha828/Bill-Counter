@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-
+import 'package:book_bank/components/constant/constant.dart' as cost;
 import 'package:book_bank/view/login_screen/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:validation_plus/validate.dart';
-
 import '../view/main_screen/main_screen.dart';
 
 class AuthController extends GetxController {
@@ -78,7 +77,7 @@ class AuthController extends GetxController {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("email", email);
       await prefs.setString("password", password);
-
+      cost.email = email;
       Get.offAll(MainScreen());
     } catch (e) {
       _handleAuthError(e, width);
@@ -121,7 +120,7 @@ class AuthController extends GetxController {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("email", email);
       await prefs.setString("password", password);
-
+      cost.email = email;
       Get.offAll(MainScreen());
     } catch (e) {
       _handleAuthError(e, width);

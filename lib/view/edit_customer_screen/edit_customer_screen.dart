@@ -38,7 +38,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
     try {
       // Update customer data in Firestore
       await FirebaseFirestore.instance
-          .collection('customers')
+          .collection(email)
           .doc(widget.customer.id)
           .update({
         'name': name,
@@ -58,7 +58,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
     try {
       // Get the document snapshot for the given customer ID
       DocumentSnapshot customerDoc = await FirebaseFirestore.instance
-          .collection('customers')
+          .collection(email)
           .doc(customerId)
           .get();
 

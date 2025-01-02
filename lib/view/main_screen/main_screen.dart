@@ -105,7 +105,7 @@ class MainScreen extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.person),
                 title: const Text('Start New Month'),
-                onTap:() async => controller.isLoading.value
+                onTap: () async => controller.isLoading.value
                     ? {}
                     : await controller.copyCustomerNamesForNewMonth(context),
               ),
@@ -140,56 +140,52 @@ class MainScreen extends StatelessWidget {
           ),
         ),
         actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.copy, color: Colors.white),
-          //   onPressed: () async => controller.isLoading.value
-          //       ? {}
-          //       : await controller.copyCustomerNamesForNewMonth(context),
-          // ),
           IconButton(
-            icon: const Icon(Icons.arrow_forward, color: Colors.white),
-            onPressed: ()=> controller.fetchAndOpenInvoicePdf(context,controller.selectedMonth.value)
-          ),
+              icon: const Icon(Icons.arrow_forward, color: Colors.white),
+              onPressed: () => controller.fetchAndOpenInvoicePdf(
+                  context, controller.selectedMonth.value)),
         ],
       ),
-      body: Obx(() {
-        return Stack(
-          children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: controller.searchController,
-                    onChanged: (query) => controller.filterCustomers(query),
-                    decoration: const InputDecoration(
-                      labelText: 'Search Customers',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(),
+      body: Obx(
+        () {
+          return Stack(
+            children: [
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: controller.searchController,
+                      onChanged: (query) => controller.filterCustomers(query),
+                      decoration: const InputDecoration(
+                        labelText: 'Search Customers',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('customers')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection(email)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
 
-                        return ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: controller.filteredCustomers.length,
-                          itemBuilder: (context, index) {
-                            final customer =
-                                controller.filteredCustomers[index];
-                            return StreamBuilder<
-                                    DocumentSnapshot<Map<String, dynamic>>>(
+                          return ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: controller.filteredCustomers.length,
+                            itemBuilder: (context, index) {
+                              final customer =
+                                  controller.filteredCustomers[index];
+                              return StreamBuilder<
+                                  DocumentSnapshot<Map<String, dynamic>>>(
                                 stream: controller
                                     .getCustomerMonthlyDataStream(customer.id),
                                 builder: (context, monthlyDataSnapshot) {
@@ -209,50 +205,51 @@ class MainScreen extends StatelessWidget {
 
                                   // If data exists, display the relevant data in subtitle
                                   final data = monthlyDataSnapshot.data!.data();
-                                  double totalMilk = double.parse(
-                                          data!['total_milk'].toString()) ??
-                                      0.0;
+                                  double totalMilk = double.parse(data!['total_milk'].toString()) ?? 0.0;
                                   String milkData =
-                                      data?['summary'] ?? "xx:(0-0):xx";
+                                      data['summary'] ?? "xx:(0-0):xx";
                                   String receivedAmount =
-                                      data?['received_amount'].toString() ??
-                                          0.toString();
+                                      data['received_amount'].toString();
                                   String previousAmount =
-                                      data?['previous_amount'].toString() ??
-                                          0.toString();
+                                      data['previous_amount'].toString();
 
                                   return _buildCustomerTile(
-                                      customer,
-                                      Text(
-                                        milkData
-                                            .split(":")[1]
-                                            .replaceAll("(", " ")
-                                            .replaceAll(")", " ")
-                                            .replaceAll("-", "--"),
-                                      ),
-                                      Text(
-                                        "${double.parse(totalMilk.toStringAsFixed(2))}L - ${(double.parse(previousAmount) - double.parse(receivedAmount)).toStringAsFixed(0)}",
-                                        style:
-                                            TextStyle(fontSize: width * 0.05),
-                                      ),
-                                      controller,
-                                      context);
-                                });
-                          },
-                          // separatorBuilder: (context, index) => const Divider(),
-                        );
-                      },
+                                    customer,
+                                    Text(
+                                      milkData
+                                          .split(":")[1]
+                                          .replaceAll("(", " ")
+                                          .replaceAll(")", " ")
+                                          .replaceAll("-", "--"),
+                                    ),
+                                    Summary(
+                                        totalMilk: totalMilk,
+                                        previousAmount: previousAmount,
+                                        receivedAmount: receivedAmount,
+                                        width: width),
+                                    controller,
+                                    context,
+                                  );
+                                },
+                              );
+                            },
+                            // separatorBuilder: (context, index) => const Divider(),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            controller.isLoading.isTrue
-                ? const Positioned.fill(child: LoadingIndicator())
-                : const SizedBox.shrink()
-          ],
-        );
-      }),
+                ],
+              ),
+              controller.isLoading.isTrue
+                  ? const Positioned.fill(
+                      child: LoadingIndicator(),
+                    )
+                  : const SizedBox.shrink(),
+            ],
+          );
+        },
+      ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: appThemeColor,
         onPressed: () async => await controller.fetchAndOpenSummaryPdf(
@@ -287,10 +284,37 @@ class MainScreen extends StatelessWidget {
       onLongPress: () => controller.showDeleteOptions(customer.id, context),
       onTap: () => Get.to(
         MonthlyDataInputScreen(
-          customer: CustomerModel(id:customer.id ,name:customer['name'] ,phoneNumber: "+92xxx",),
+          customer: CustomerModel(
+            id: customer.id,
+            name: customer['name'],
+            phoneNumber: "+92xxx",
+          ),
           selectedMonth: controller.selectedMonth.value,
         ),
       ),
+    );
+  }
+}
+
+class Summary extends StatelessWidget {
+  const Summary({
+    super.key,
+    required this.totalMilk,
+    required this.previousAmount,
+    required this.receivedAmount,
+    required this.width,
+  });
+
+  final double totalMilk;
+  final String previousAmount;
+  final String receivedAmount;
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      "${double.parse(totalMilk.toStringAsFixed(2))}L - ${(double.parse(previousAmount) - double.parse(receivedAmount)).toStringAsFixed(0)}",
+      style: TextStyle(fontSize: width * 0.05),
     );
   }
 }

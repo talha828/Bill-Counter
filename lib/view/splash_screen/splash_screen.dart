@@ -8,7 +8,6 @@ class SplashScreen extends StatelessWidget {
    SplashScreen({super.key}); // Initialize controller
   final SplashScreenController controller = Get.put(SplashScreenController());
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
