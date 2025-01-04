@@ -113,8 +113,7 @@ class MainScreen extends StatelessWidget {
                 leading: const Icon(Icons.logout),
                 title: const Text('LogOut'),
                 onTap: () async {
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
                   await prefs.setString("email", "null");
                   await prefs.setString("password", "password");
                   Get.offAll(LoginScreen());
@@ -182,46 +181,32 @@ class MainScreen extends StatelessWidget {
                             shrinkWrap: true,
                             itemCount: controller.filteredCustomers.length,
                             itemBuilder: (context, index) {
-                              final customer =
-                                  controller.filteredCustomers[index];
+                              final customer = controller.filteredCustomers[index];
                               return StreamBuilder<
                                   DocumentSnapshot<Map<String, dynamic>>>(
-                                stream: controller
-                                    .getCustomerMonthlyDataStream(customer.id),
+                                stream: controller.getCustomerMonthlyDataStream(customer.id),
                                 builder: (context, monthlyDataSnapshot) {
-                                  if (monthlyDataSnapshot.connectionState ==
-                                      ConnectionState.waiting) {
+                                  if (monthlyDataSnapshot.connectionState == ConnectionState.waiting) {
                                     return const ListTile(
                                       title: Text('Loading...'),
                                       subtitle: Text('Fetching data...'),
                                     );
                                   }
 
-                                  if (monthlyDataSnapshot.hasError ||
-                                      !monthlyDataSnapshot.hasData ||
-                                      !monthlyDataSnapshot.data!.exists) {
+                                  if (monthlyDataSnapshot.hasError || !monthlyDataSnapshot.hasData || !monthlyDataSnapshot.data!.exists) {
                                     return Container();
                                   }
 
                                   // If data exists, display the relevant data in subtitle
                                   final data = monthlyDataSnapshot.data!.data();
                                   double totalMilk = double.parse(data!['total_milk'].toString()) ?? 0.0;
-                                  String milkData =
-                                      data['summary'] ?? "xx:(0-0):xx";
-                                  String receivedAmount =
-                                      data['received_amount'].toString();
-                                  String previousAmount =
-                                      data['previous_amount'].toString();
+                                  String milkData = data['summary'] ?? "xx:(0-0):xx";
+                                  String receivedAmount = data['received_amount'].toString();
+                                  String previousAmount = data['previous_amount'].toString();
 
                                   return _buildCustomerTile(
                                     customer,
-                                    Text(
-                                      milkData
-                                          .split(":")[1]
-                                          .replaceAll("(", " ")
-                                          .replaceAll(")", " ")
-                                          .replaceAll("-", "--"),
-                                    ),
+                                    Text(milkData.split(":")[1].replaceAll("(", " ").replaceAll(")", " ").replaceAll("-", "--"),),
                                     Summary(
                                         totalMilk: totalMilk,
                                         previousAmount: previousAmount,
@@ -233,7 +218,6 @@ class MainScreen extends StatelessWidget {
                                 },
                               );
                             },
-                            // separatorBuilder: (context, index) => const Divider(),
                           );
                         },
                       ),
@@ -273,8 +257,7 @@ class MainScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCustomerTile(DocumentSnapshot customer, Widget subtitle,
-      Widget trailing, MainScreenController controller, BuildContext context) {
+  Widget _buildCustomerTile(DocumentSnapshot customer, Widget subtitle, Widget trailing, MainScreenController controller, BuildContext context) {
     return ListTile(
       title: Text(
         customer['name'].toString().toUpperCase(),
