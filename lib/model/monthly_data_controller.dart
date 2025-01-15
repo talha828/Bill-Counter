@@ -13,6 +13,7 @@ class MonthlyDataController extends GetxController {
 
   final previousAmountController = TextEditingController();
   final receivedAmountController = TextEditingController();
+  final milkAmountController = TextEditingController();
   RxBool isLoading = false.obs;
   RxList<List<double>> milkEntries = <List<double>>[].obs;
   RxDouble totalMilk = 0.0.obs;
@@ -58,6 +59,8 @@ class MonthlyDataController extends GetxController {
           double.parse(document.get('received_amount').toString())?.toStringAsFixed(2) ?? '0';
       totalMilk.value = double.parse(document.get('total_milk').toString());
       List<dynamic> entries = document.get('milk_entries') ?? [];
+      String summary = document.get('summary');
+      milkAmountController.text = summary.split(":").last;
       milkEntries.value = List.generate(
           entries.length, (i) => [double.parse(entries[i].toStringAsFixed(2))]);
       calculateTotal();
@@ -69,8 +72,7 @@ class MonthlyDataController extends GetxController {
   void saveData() async {
     isLoading.value = true;
     List<String> groupedEntries = _groupMilkEntries();
-    String summary =
-        "${customer.name}:${groupedEntries.join('')}:${int.parse((double.parse(previousAmountController.text)-double.parse(receivedAmountController.text.toString())).toStringAsFixed(0))}";
+    String summary = "${customer.name}:${groupedEntries.join('')}:${int.parse((double.parse(previousAmountController.text)-double.parse(receivedAmountController.text.toString())).toStringAsFixed(0))}:${milkAmountController.text}";
 
     try {
       await FirebaseFirestore.instance

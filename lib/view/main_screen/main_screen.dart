@@ -133,7 +133,7 @@ class MainScreen extends StatelessWidget {
                 ? {}
                 : await controller.showMonthPickerDialog(context),
             child: Text(
-              controller.selectedMonth.value.replaceAll("20", ""),
+              controller.selectedMonth.value,
               style: const TextStyle(color: Colors.white),
             ),
           ),

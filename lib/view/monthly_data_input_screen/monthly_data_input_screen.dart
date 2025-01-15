@@ -12,7 +12,6 @@ class MonthlyDataInputScreen extends StatelessWidget {
   final CustomerModel customer;
   final String selectedMonth;
 
-
   const MonthlyDataInputScreen({
     super.key,
     required this.customer,
@@ -26,23 +25,23 @@ class MonthlyDataInputScreen extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
-              leading: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                  )),
-              backgroundColor: appThemeColor,
-              title: Text(
-                customer.name.toUpperCase(),
-                style: const TextStyle(color: Colors.white),
-              ),
-          actions: [
-            IconButton(
-                icon: const Icon(Icons.edit, color: Colors.white),
-                onPressed: ()=>Get.to(EditCustomerScreen(customer:customer)),
+            leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                )),
+            backgroundColor: appThemeColor,
+            title: Text(
+              customer.name.toUpperCase(),
+              style: const TextStyle(color: Colors.white),
             ),
-          ],
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.white),
+                onPressed: () => Get.to(EditCustomerScreen(customer: customer)),
+              ),
+            ],
           ),
           body: Stack(
             children: [
@@ -52,20 +51,37 @@ class MonthlyDataInputScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Previous Amount Input
-                    BTextField(
-                      controller: controller.previousAmountController,
-                      hintText: "27000",
-                      keyboardType: TextInputType.number,
-                      labelText: "Previous Amount",
-                      obscureText: false,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.43,
+                          child: BTextField(
+                            controller: controller.previousAmountController,
+                            hintText: "27000",
+                            keyboardType: TextInputType.number,
+                            labelText: "Previous Amount",
+                            obscureText: false,
+                          ),
+                        ), // Received Amount Input
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.43,
+                          child: BTextField(
+                            controller: controller.receivedAmountController,
+                            hintText: "1000",
+                            keyboardType: TextInputType.number,
+                            labelText: "Received Amount",
+                            obscureText: false,
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: MediaQuery.of(context).size.width * 0.04),
-                    // Received Amount Input
                     BTextField(
-                      controller: controller.receivedAmountController,
-                      hintText: "1000",
+                      controller: controller.milkAmountController,
+                      hintText: "220",
                       keyboardType: TextInputType.number,
-                      labelText: "Received Amount",
+                      labelText: "Milk Price Pre Liter",
                       obscureText: false,
                     ),
                     SizedBox(height: MediaQuery.of(context).size.width * 0.04),
@@ -87,15 +103,15 @@ class MonthlyDataInputScreen extends StatelessWidget {
                             child: Container(
                               margin: EdgeInsets.all(3),
                               decoration: BoxDecoration(
-                                border: Border.all(color: controller.milkEntries[index][0] == 0
-                                    ? appThemeColor.withOpacity(0.5): Colors.white
-                                    ,),
-                                color: controller.milkEntries[index][0] == 0
-                                    ? Colors.white
-                                    : appThemeColor.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(5)
-                              ),
-                              
+                                  border: Border.all(
+                                    color: controller.milkEntries[index][0] == 0
+                                        ? appThemeColor.withOpacity(0.5)
+                                        : Colors.white,
+                                  ),
+                                  color: controller.milkEntries[index][0] == 0
+                                      ? Colors.white
+                                      : appThemeColor.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,

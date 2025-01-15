@@ -14,6 +14,8 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../helper/month_year_helper.dart';
+
 class MainScreenController extends GetxController {
   var selectedMonth = DateFormat('MMMM - yyyy').format(DateTime.now().subtract(const Duration(days: 15))).obs;
   var availableMonths = <String>[].obs;
@@ -86,7 +88,8 @@ class MainScreenController extends GetxController {
         months.add(doc.id); // Add month (doc id) to the set
       });
     }
-    availableMonths.assignAll(months.toList());
+    List<String>? sortedMonths = MonthYearHelper.sortMonthYearList(months.toList());
+    availableMonths.assignAll(sortedMonths!);
   }
 
   void setEntriesCount() {

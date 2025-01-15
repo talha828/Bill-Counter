@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: appThemeColor,
         primaryColorDark: appThemeColor,
-
         primarySwatch: createMaterialColor(const Color(0xff6C63FF)),
         textTheme: GoogleFonts.mulishTextTheme(Theme.of(context).textTheme),
         primaryTextTheme:
