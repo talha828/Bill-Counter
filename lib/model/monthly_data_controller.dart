@@ -1,4 +1,7 @@
+
+
 import 'package:book_bank/components/constant/constant.dart';
+import 'package:book_bank/components/widgets/bbutton.dart';
 import 'package:book_bank/helper/helper.dart';
 import 'package:book_bank/model/customer_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -129,14 +132,61 @@ class MonthlyDataController extends GetxController {
   // Edit a specific cell
   void editCell(int index) {
     TextEditingController controller =
-        TextEditingController(text: milkEntries[index][0].toString());
+    TextEditingController(text: milkEntries[index][0].toString());
+
+    // List of predefined values
+    final List<String> values = ['0.5', '1', '1.5', '2'];
+
     Get.defaultDialog(
-      title: "Edit Milk Quantity for Day ${index + 1}",
-      content: TextField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        decoration: const InputDecoration(labelText: 'Milk Quantity (Liters)'),
+      titlePadding: const EdgeInsets.only(top: 20),
+      contentPadding: const EdgeInsets.only(right: 20,left: 20,bottom: 20,top: 20),
+      titleStyle: const TextStyle(fontSize: 18),
+      title: "Quantity for Day ${index + 1}",
+      content: Column(
+        children: [
+          TextField(
+            style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+            controller: controller,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(border: InputBorder.none),
+          ),
+          const SizedBox(height: 16), // Add some spacing
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: values.map((value) {
+              return GestureDetector(
+                onTap: ()=> controller.text = value,
+                child: SizedBox(
+                  width: 50,
+                  child: Container(
+                    margin: const EdgeInsets.all(3),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: appThemeColor.withOpacity(0.5)
+                        ),
+                        color: Colors.white ,
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(value,
+                              style: const TextStyle(
+                                  color: Colors.black)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+            ).toList(),
+          ),
+        ],
       ),
+      confirmTextColor: Colors.white,
       onConfirm: () {
         if (controller.text.isNum) {
           if (double.parse(controller.text) > 25) {

@@ -101,7 +101,7 @@ class MonthlyDataInputScreen extends StatelessWidget {
                             onTap: () => controller.refillPreviousEntry(index),
                             onDoubleTap: () => controller.editCell(index),
                             child: Container(
-                              margin: EdgeInsets.all(3),
+                              margin: const EdgeInsets.all(3),
                               decoration: BoxDecoration(
                                   border: Border.all(
                                     color: controller.milkEntries[index][0] == 0
