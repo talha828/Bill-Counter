@@ -12,11 +12,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:text_to_speech/text_to_speech.dart';
 
 class MainScreen extends StatelessWidget {
   MainScreen({super.key});
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  TextToSpeech tts = TextToSpeech();
   @override
   Widget build(BuildContext context) {
     final MainScreenController controller = Get.put(MainScreenController());
@@ -259,8 +261,14 @@ class MainScreen extends StatelessWidget {
 
   Widget _buildCustomerTile(DocumentSnapshot customer, Widget subtitle, Widget trailing, MainScreenController controller, BuildContext context) {
     return ListTile(
-      title: Text(
-        customer['name'].toString().toUpperCase(),
+      title: Row(
+        children: [
+          Text(
+            customer['name'].toString().toUpperCase(),
+          ),
+          const SizedBox(width: 10,),
+          IconButton(onPressed: ()=> tts.speak(customer['name'].toString()), icon: const Icon(Icons.volume_up))
+        ],
       ),
       subtitle: subtitle,
       trailing: trailing,

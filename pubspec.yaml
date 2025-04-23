@@ -52,6 +52,7 @@ dependencies:
   pdf:
   open_file:
   month_picker_dialog: 5.1.0
+  text_to_speech: ^0.2.3
 
 
 dev_dependencies:

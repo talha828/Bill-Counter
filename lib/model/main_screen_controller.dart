@@ -177,7 +177,7 @@ class MainScreenController extends GetxController {
             "previous_amount": ((totalMilk * milkPrice) + newPreviousAmount)
                 .toStringAsFixed(0),
             "summary":
-                "${doc['name']}:(0-0):${newPreviousAmount.toStringAsFixed(0)}:milkPrice",
+                "${doc['name']}:(0-0):${newPreviousAmount.toStringAsFixed(0)}:$milkPrice",
           });
         }
       }
